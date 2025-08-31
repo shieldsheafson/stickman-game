@@ -1,4 +1,5 @@
 #include "stickmanconfig.h"
+#include "collision.h"
 #include "float2.h"
 #include "player.h"
 #include "terrain.h"
@@ -19,6 +20,7 @@ static int texture_width = 0;
 static int texture_height = 0;
 
 Player p(t, Float2(0,0));
+Terrain f(Float2(100,0), Float2(-100,-100));
 
 static Uint64 lastFrameTime = 0;
 
@@ -96,24 +98,48 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   }
 
   p.Update(deltaTime);
+  Collision collision = f.Collision(p);
 
-  if (p.GetPosition().y <= 0) {
-    p.SetOnGround(true);
-    p.GetPosition() = Float2(p.GetPosition().x, 0);
+  switch (collision) {
+    case Collision::NONE:
+      p.SetOnGround(false);
+      break;
+    case Collision::GROUND:
+      p.SetBottom(f.GetTop());
+      p.SetVelocityY(0);
+      p.SetOnGround(true);
+      break;
+    case Collision::CEILING:
+      p.SetTop(f.GetBottom());
+      p.SetVelocityY(0);
+      p.SetOnGround(false);
+      break;
+    case Collision::LEFTWALL:
+      p.SetLeft(f.GetRight());
+      p.SetVelocityX(0);
+      break;
+    case Collision::RIGHTWALL:
+      p.SetRight(f.GetLeft());
+      p.SetVelocityX(0);
+      break;
+  }
+
+  if (p.GetPosition().y > 340 || p.GetPosition().y < -340) {
+    p.GetPosition() = Float2(0,0);
   }
 
 
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
-  Terrain floor = Terrain(Float2(100,0), Float2(-100,-100));
-  SDL_FRect floorRect = SDL_FRect{ WorldToScreen(floor.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).x, 
-                                   WorldToScreen(floor.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
-                                   floor.GetWidth(), 
-                                   floor.GetHeight() };
+  SDL_FRect floorRect = SDL_FRect{ WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).x, 
+                                   WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
+                                   f.GetWidth(), 
+                                   f.GetHeight() };
 
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &floorRect);
+  // SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 
   Float2 point = WorldToScreen(p.GetPosition(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT);
   

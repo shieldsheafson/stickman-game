@@ -1,6 +1,8 @@
 #pragma once
 
+#include "collision.h"
 #include "float2.h"
+#include "player.h"
 
 #include <SDL3/SDL.h>
 
@@ -32,7 +34,9 @@ class Terrain {
     float GetWidth() const { return mMax.x - mMin.x; }
     float GetHeight() const { return mMax.y - mMin.y; }
 
-    bool Contains(Float2 p) {
-      return p.x >= mMin.x && p.y >= mMin.y && p.x <= mMax.x && p.y <= mMax.y;
+    bool Contains(const Float2& p) const {
+      return p.x > mMin.x && p.y > mMin.y && p.x < mMax.x && p.y < mMax.y;
     }
+
+    Collision Collision(const Player& player) const;
 };

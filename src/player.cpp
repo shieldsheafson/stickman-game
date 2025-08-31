@@ -1,17 +1,10 @@
 #include "player.h"
 
-void Player::SetMovingLeft(bool movingLeft) {
-  mMovingLeft = movingLeft;
-}
-
-void Player::SetMovingRight(bool movingRight) {
-  mMovingRight = movingRight;
-}
-
 void Player::MoveRight() {
   mMovingRight = true;
   mMovingLeft = false;
 }
+
 void Player::MoveLeft() {
   mMovingRight = false;
   mMovingLeft = true;
@@ -22,10 +15,6 @@ void Player::Jump() {
     mVelocity.y = mJumpStrength;
     mOnGround = false;
   }
-}
-
-void Player::SetOnGround(bool onGround) { 
-  mOnGround = onGround; 
 }
 
 void Player::UpdateHorizontalVelocity(float deltaTime) {
@@ -66,6 +55,8 @@ void Player::ApplyFriction(float deltaTime) {
 void Player::UpdateVerticalVelocity(float deltaTime) {
   if (!mOnGround) {
     mVelocity.y = std::max(mTerminalVelocity, mVelocity.y + mGravity * deltaTime);
+  } else {
+   mVelocity.y = std::max(0.0f, mVelocity.y);
   }
 }
 

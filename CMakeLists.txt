@@ -23,10 +23,13 @@ target_sources(stickman PRIVATE
     src/driver.cpp
     src/float2.cpp
     src/player.cpp
+    src/terrain.cpp
     src/utils.cpp
     
+    src/collision.h
     src/float2.h
     src/player.h
+    src/terrain.h
     src/utils.h
 
     # Generated header

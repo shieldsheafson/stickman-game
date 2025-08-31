@@ -1,4 +1,4 @@
-#include "Float2.h"
+#include "float2.h"
 
 // arithmetic operators with other Float2---------------------
 Float2& Float2::operator+=(const Float2& rhs) {
