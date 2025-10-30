@@ -23,6 +23,7 @@ target_sources(stickman PRIVATE
     src/collision.cpp 
     src/driver.cpp
     src/float2.cpp
+    src/game.cpp
     src/level.cpp
     src/player.cpp
     src/terrain.cpp

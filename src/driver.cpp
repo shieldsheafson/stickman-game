@@ -1,6 +1,8 @@
 #include "stickmanconfig.h"
 #include "collision.h"
 #include "float2.h"
+#include "game.h"
+#include "level.h"
 #include "player.h"
 #include "terrain.h"
 #include "utils.h"
@@ -18,8 +20,7 @@ static SDL_Texture *texture = NULL;
 static int texture_width = 0;
 static int texture_height = 0;
 
-Player p(texture, Float2(0,0));
-Terrain f(Float2(100,0), Float2(-100,-100));
+Game game;
 
 static Uint64 lastFrameTime = 0;
 
@@ -67,8 +68,16 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   SDL_DestroySurface(surface);  /* done with this, the texture has a copy of the pixels now. */
 
-  p = Player(texture, Float2(0,0));
+  Terrain f(Float2(100,0), Float2(-100,-100));
+
+  std::vector<Terrain> terrain;
+  terrain.push_back(f);
+  Level level = Level(terrain);
+  std::vector<Level> levels;
+  levels.push_back(level);
+  Player p = Player(texture, Float2(0,0));
   p.SetOnGround(true);
+  game = Game(p, levels);
   return SDL_APP_CONTINUE;
 }
 
@@ -92,44 +101,10 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
   
+  game.Update(keystate, deltaTime);
 
-  p.SetMovingLeft(keystate[SDL_SCANCODE_LEFT]);
-  p.SetMovingRight(keystate[SDL_SCANCODE_RIGHT]);
-  if (keystate[SDL_SCANCODE_Z]) {
-    p.Jump();
-  }
-
-  p.Update(deltaTime);
-  Collision collision = f.Collision(p);
-
-  switch (collision) {
-    case Collision::NONE:
-      p.SetOnGround(false);
-      break;
-    case Collision::GROUND:
-      p.SetBottom(f.GetTop());
-      p.SetVelocityY(0);
-      p.SetOnGround(true);
-      break;
-    case Collision::CEILING:
-      p.SetTop(f.GetBottom());
-      p.SetVelocityY(0);
-      p.SetOnGround(false);
-      break;
-    case Collision::LEFTWALL:
-      p.SetLeft(f.GetRight());
-      p.SetVelocityX(0);
-      break;
-    case Collision::RIGHTWALL:
-      p.SetRight(f.GetLeft());
-      p.SetVelocityX(0);
-      break;
-  }
-
-  if (p.GetPosition().y > 340 || p.GetPosition().y < -340) {
-    p.GetPosition() = Float2(0,0);
-  }
-
+  const Terrain& f = game.GetLevel().mTerrain.at(0);
+  const Player& p = game.GetPlayer();
   SDL_FRect floorRect = SDL_FRect{ WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).x, 
                                    WorldToScreen(f.GetMax(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
                                    f.GetWidth(), 

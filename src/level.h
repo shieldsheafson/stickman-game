@@ -1,21 +1,15 @@
 #pragma once
 
+#include "collision.h"
 #include "float2.h"
 #include "player.h"
 #include "terrain.h"
 
 #include <vector>
 
-class Level {
-  private:
-    std::vector<Terrain> mTerrain;
+struct Level {
+  std::vector<Terrain> mTerrain;
 
-  public:
-    Level() {}
-
-    void Collision(Player& p) {
-      for (const Terrain& terrain : mTerrain) {
-        
-      }
-    }
+  Level() {}
+  Level(const std::vector<Terrain>& terrain): mTerrain(terrain) {}
 };

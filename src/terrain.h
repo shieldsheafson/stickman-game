@@ -37,6 +37,4 @@ class Terrain {
     bool Contains(const Float2& p) const {
       return p.x > mMin.x && p.y > mMin.y && p.x < mMax.x && p.y < mMax.y;
     }
-
-    Collision Collision(const Player& player) const;
 };

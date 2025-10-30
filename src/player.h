@@ -34,6 +34,7 @@ private:
   void ApplyFriction(float deltaTime);
 
 public:
+  Player(): mTexture(NULL) {}
   Player(SDL_Texture *texture, const Float2& position, 
     float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
     float jumpStrength = 500.0f, float gravity = -1200.0f, 
