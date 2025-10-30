@@ -15,11 +15,10 @@
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static SDL_Texture *texture = NULL;
-static SDL_Texture **t = &texture; 
 static int texture_width = 0;
 static int texture_height = 0;
 
-Player p(t, Float2(0,0));
+Player p(texture, Float2(0,0));
 Terrain f(Float2(100,0), Float2(-100,-100));
 
 static Uint64 lastFrameTime = 0;
@@ -68,6 +67,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   SDL_DestroySurface(surface);  /* done with this, the texture has a copy of the pixels now. */
 
+  p = Player(texture, Float2(0,0));
   p.SetOnGround(true);
   return SDL_APP_CONTINUE;
 }
@@ -83,6 +83,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 // Runs once each frame
 SDL_AppResult SDL_AppIterate(void *appstate) {
   SDL_FRect dst_rect;
+  SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+  SDL_RenderClear(renderer);
 
   Uint64 currentTime = SDL_GetTicks();
   float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // Convert to seconds
@@ -128,27 +130,23 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     p.GetPosition() = Float2(0,0);
   }
 
-
-  SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
-  SDL_RenderClear(renderer);
-
   SDL_FRect floorRect = SDL_FRect{ WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).x, 
-                                   WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
+                                   WorldToScreen(f.GetMax(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
                                    f.GetWidth(), 
                                    f.GetHeight() };
 
   SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
   SDL_RenderFillRect(renderer, &floorRect);
-  // SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
 
   Float2 point = WorldToScreen(p.GetPosition(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT);
-  
-  dst_rect.x = point.x - texture_width /2;
-  dst_rect.y = point.y - texture_height/2;
+  dst_rect.x = point.x;
+  dst_rect.y = point.y - texture_height;
   dst_rect.w = (float) texture_width;
   dst_rect.h = (float) texture_height;
   SDL_RenderTexture(renderer, p.GetTexture(), NULL, &dst_rect);
-
+  SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
+  SDL_RenderRect(renderer, &dst_rect);
+  
   SDL_RenderPresent(renderer);  /* put it all on the screen! */
   return SDL_APP_CONTINUE;  /* carry on with the program! */
 }

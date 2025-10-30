@@ -1,5 +1,7 @@
 #pragma once
 
+#include "float2.h"
+
 enum class Collision {
   NONE,
   GROUND,
@@ -7,3 +9,5 @@ enum class Collision {
   LEFTWALL,
   RIGHTWALL
 };
+
+Collision Collides(Float2 minOne, Float2 maxOne, Float2 minTwo, Float2 maxTwo);

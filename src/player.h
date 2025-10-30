@@ -5,7 +5,7 @@
 
 class Player {
 private:
-  SDL_Texture **mTexture;
+  SDL_Texture *mTexture;
   float mTextureWidth;
   float mTextureHeight;
 
@@ -34,7 +34,7 @@ private:
   void ApplyFriction(float deltaTime);
 
 public:
-  Player(SDL_Texture **texture, const Float2& position, 
+  Player(SDL_Texture *texture, const Float2& position, 
     float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
     float jumpStrength = 500.0f, float gravity = -1200.0f, 
     float terminalVelocity = -800.0f)
@@ -46,10 +46,10 @@ public:
       mGroundFriction(30), mAirFriction(5),
       mOnGround(false), mMovingLeft(false),
       mMovingRight(false) {
-        SDL_GetTextureSize(*mTexture, &mTextureWidth, &mTextureHeight);
+        SDL_GetTextureSize(mTexture, &mTextureWidth, &mTextureHeight);
       }
   
-  SDL_Texture* GetTexture() const { return *mTexture; }
+  SDL_Texture* GetTexture() const { return mTexture; }
   const Float2& GetPosition() const { return mPosition; }
   float GetBottom() const { return mPosition.y; }
   float GetTop() const { return mPosition.y + mTextureHeight; }
