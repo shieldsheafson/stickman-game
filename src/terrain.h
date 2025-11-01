@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <cmath>
+
 #include "collision.h"
 #include "float2.h"
 #include "player.h"
@@ -8,33 +11,36 @@
 
 class Terrain {
   private:
-    Float2 mMin;
-    Float2 mMax;
+    SDL_FRect rect;
 
   public:
-    Terrain(Float2 a, Float2 b): mMin(a), mMax(b) {
-      if (a.x > b.x) {
-        std::swap(mMin.x, mMax.x);
-      }
-      if (a.y > b.y) {
-        std::swap(mMin.y, mMax.y);
-      }
-    }
+    Terrain(Float2 a, Float2 b): 
+    rect{std::min(a.x, b.x), 
+         std::min(a.y, b.y), 
+         std::abs(b.x - a.x), 
+         std::abs(b.y - a.y)} {}
 
-    Terrain(Float2 topRight, float height, float width): mMin(topRight), mMax(Float2(topRight.x + width, topRight.y + height)) {}
+    Terrain(Float2 topLeft, float width, float height): 
+       rect{topLeft.x, topLeft.y, width, height} {}
 
-    float GetTop() const { return mMax.y; }
-    float GetBottom() const { return mMin.y; }
-    float GetLeft() const { return mMin.x; }
-    float GetRight() const { return mMax.x; }
+    float GetTop() const { return rect.y; }
+    float GetBottom() const { return rect.y + rect.h; }
+    float GetLeft() const { return rect.x; }
+    float GetRight() const { return rect.x + rect.w; }
     
-    Float2 GetMin() const { return mMin; }
-    Float2 GetMax() const { return mMax; }
+    Float2 GetMin() const { return Float2(rect.x, rect.y); }
+    Float2 GetMax() const { return Float2(rect.x + rect.w, rect.y + rect.h); }
     
-    float GetWidth() const { return mMax.x - mMin.x; }
-    float GetHeight() const { return mMax.y - mMin.y; }
+    float GetWidth() const { return rect.w; }
+    float GetHeight() const { return rect.h; }
+
+    const SDL_FRect* GetSDLRect() const { return &rect; }
 
     bool Contains(const Float2& p) const {
-      return p.x > mMin.x && p.y > mMin.y && p.x < mMax.x && p.y < mMax.y;
+      return p.x >= rect.x && p.y >= rect.y && p.x < rect.x + rect.w && p.y < rect.y + rect.h;
     }
 };
+
+bool operator==(const Terrain& lhs, const Terrain& rhs) {
+  return lhs.GetMin() == rhs.GetMin() && lhs.GetMax() == rhs.GetMax();
+}
