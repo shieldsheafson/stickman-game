@@ -12,7 +12,7 @@ void Player::MoveLeft() {
 
 void Player::Jump() {
   if (mOnGround) {
-    mVelocity.y = mJumpStrength;
+    mVelocity.y = -mJumpStrength;
     mOnGround = false;
   }
 }
@@ -54,9 +54,9 @@ void Player::ApplyFriction(float deltaTime) {
 
 void Player::UpdateVerticalVelocity(float deltaTime) {
   if (!mOnGround) {
-    mVelocity.y = std::max(mTerminalVelocity, mVelocity.y + mGravity * deltaTime);
+    mVelocity.y = std::min(mTerminalVelocity, mVelocity.y + mGravity * deltaTime);
   } else {
-   mVelocity.y = std::max(0.0f, mVelocity.y);
+    mVelocity.y = std::min(0.0f, mVelocity.y);
   }
 }
 

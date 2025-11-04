@@ -37,8 +37,8 @@ public:
   Player(): mTexture(NULL) {}
   Player(SDL_Texture *texture, const Float2& position, 
     float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
-    float jumpStrength = 500.0f, float gravity = -1200.0f, 
-    float terminalVelocity = -800.0f)
+    float jumpStrength = 500.0f, float gravity = 1200.0f, 
+    float terminalVelocity = 800.0f)
     : mTexture(texture), mTextureHeight(0), mTextureWidth(0),
       mPosition(position), mVelocity(0, 0),
       mMaxHorizontalSpeed(maxHorizontalSpeed), 
@@ -52,8 +52,8 @@ public:
   
   SDL_Texture* GetTexture() const { return mTexture; }
   const Float2& GetPosition() const { return mPosition; }
-  float GetBottom() const { return mPosition.y; }
-  float GetTop() const { return mPosition.y + mTextureHeight; }
+  float GetBottom() const { return mPosition.y + mTextureHeight; }
+  float GetTop() const { return mPosition.y; }
   float GetLeft() const { return mPosition.x; }
   float GetRight() const { return mPosition.x + mTextureWidth; }
   float GetWidth() const { return mTextureWidth; }
@@ -69,8 +69,8 @@ public:
   void StopHorizontalMovement() {mMovingLeft = false; mMovingRight = false;}
   void Jump();
 
-  void SetBottom(float bottom) { mPosition.y = bottom; }
-  void SetTop(float top) { mPosition.y = top - mTextureHeight; }
+  void SetBottom(float bottom) { mPosition.y = bottom - mTextureHeight; }
+  void SetTop(float top) { mPosition.y = top; }
   void SetLeft(float left) { mPosition.x = left; }
   void SetRight(float right) { mPosition.x = right - mTextureWidth; }
   void SetOnGround(bool onGround) { mOnGround = onGround; }
