@@ -68,10 +68,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   SDL_DestroySurface(surface);  /* done with this, the texture has a copy of the pixels now. */
 
-  Terrain f(Float2(100,0), Float2(-100,-100));
+  Terrain a(Float2(0, 400), 100, 100);
+  Terrain b(Float2(600, 100), 100, 200);
+  Terrain c(Float2(300, 400), 200, 100);
+  Terrain d(Float2(700, 700), 100, 200);
+  Terrain e(Float2(400, 400), 200, 100);
 
-  std::vector<Terrain> terrain;
-  terrain.push_back(f);
+  std::vector<Terrain> terrain = {a, b, c, d, e};
+  // terrain.push_back(a);
   Level level = Level(terrain);
   std::vector<Level> levels;
   levels.push_back(level);
@@ -91,7 +95,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 
 // Runs once each frame
 SDL_AppResult SDL_AppIterate(void *appstate) {
-  SDL_FRect dst_rect;
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
@@ -100,29 +103,11 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   lastFrameTime = currentTime;
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
+  // std::cout << keystate[SDL_SCANCODE_Z] << std::endl;
   
   game.Update(keystate, deltaTime);
-
-  const Terrain& f = game.GetLevel().mTerrain.at(0);
-  const Player& p = game.GetPlayer();
-  SDL_FRect floorRect = SDL_FRect{ WorldToScreen(f.GetMin(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).x, 
-                                   WorldToScreen(f.GetMax(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT).y, 
-                                   f.GetWidth(), 
-                                   f.GetHeight() };
-
-  SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRect(renderer, &floorRect);
-
-  Float2 point = WorldToScreen(p.GetPosition(), Float2(0,0), WINDOW_WIDTH, WINDOW_HEIGHT);
-  dst_rect.x = point.x;
-  dst_rect.y = point.y - texture_height;
-  dst_rect.w = (float) texture_width;
-  dst_rect.h = (float) texture_height;
-  SDL_RenderTexture(renderer, p.GetTexture(), NULL, &dst_rect);
-  SDL_SetRenderDrawColor(renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);
-  SDL_RenderRect(renderer, &dst_rect);
+  game.Render(renderer);
   
-  SDL_RenderPresent(renderer);  /* put it all on the screen! */
   return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 

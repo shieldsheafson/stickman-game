@@ -4,10 +4,11 @@
 #include "level.h"
 #include "player.h"
 #include "terrain.h"
+#include "utils.h"
 
 #include <vector>
 
-#include <SDL3/SDL_scancode.h>
+#include <SDL3/SDL.h>
 
 class Game {
   private:
@@ -19,6 +20,9 @@ class Game {
     void MovementUpdate(const bool *keystate, float deltaTime);
     void CollisionsUpdate();
 
+    void RenderCurrentLevel(SDL_Renderer *renderer) const;
+    void RenderPlayer(SDL_Renderer *renderer) const;
+
   public:
     Game() {}
     Game(const Player& player, const std::vector<Level>& levels)
@@ -26,8 +30,9 @@ class Game {
         mCurrentLevel = levels.at(0);
       }
 
-    const Player& GetPlayer() { return mPlayer; }
-    const Level& GetLevel() { return mCurrentLevel; }
+    const Player& GetPlayer() const { return mPlayer; }
+    const Level& GetLevel() const { return mCurrentLevel; }
 
     void Update(const bool *keystate, float deltaTime);
+    void Render(SDL_Renderer *renderer) const;
 };
