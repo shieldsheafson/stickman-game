@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cmath>
+
 #include "float2.h"
 
 enum class Collision {
