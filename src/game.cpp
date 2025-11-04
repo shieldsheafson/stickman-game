@@ -5,7 +5,6 @@ void Game::CollisionsUpdate() {
   for (const Terrain& terrain : mCurrentLevel.mTerrain) {
     Float2 playerMin = Float2(mPlayer.GetLeft(), mPlayer.GetTop());
     Float2 playerMax = Float2(mPlayer.GetRight(), mPlayer.GetBottom());
-    // std::cout << terrain.Contains(playerMax) << " " << terrain.Contains(playerMin) << std::endl;
     Collision collision = Collides(playerMin, playerMax, terrain.GetMin(), terrain.GetMax());
     switch (collision) {
       case Collision::NONE:

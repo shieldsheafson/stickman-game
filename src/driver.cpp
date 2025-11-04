@@ -43,12 +43,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     return SDL_APP_FAILURE;
   }
 
-  /* Textures are pixel data that we upload to the video hardware for fast drawing. Lots of 2D
-      engines refer to these as "sprites." We'll do a static texture (upload once, draw many
-      times) with data from a bitmap file. */
-
-  /* SDL_Surface is pixel data the CPU can access. SDL_Texture is pixel data the GPU can access.
-      Load a .bmp into a surface, move it to a texture from there. */
   SDL_asprintf(&path, "../Sprites/stickman.bmp");  /* allocate a string of the full file path */
   surface = SDL_LoadBMP(path);
   if (!surface) {
@@ -103,7 +97,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   lastFrameTime = currentTime;
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
-  // std::cout << keystate[SDL_SCANCODE_Z] << std::endl;
   
   game.Update(keystate, deltaTime);
   game.Render(renderer);

@@ -5,13 +5,12 @@ Collision Collides(Float2 minOne, Float2 maxOne, Float2 minTwo, Float2 maxTwo) {
       maxOne.y < minTwo.y || minOne.y > maxTwo.y) {
     return Collision::NONE;
   }
-  
+
   // Calculate overlap amounts
   float overlapLeft = abs(minTwo.x - maxOne.x);
   float overlapRight =  abs(minOne.x - maxTwo.x);
   float overlapTop = abs(minTwo.y - maxOne.y);
   float overlapBottom = abs(minOne.y - maxTwo.y);
-  // std::cout << overlapLeft << " " << overlapRight << " " << overlapTop << " " << overlapBottom << std::endl;
   
   float maxOverlap = std::max({overlapLeft, overlapRight, overlapTop, overlapBottom});
 
