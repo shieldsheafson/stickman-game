@@ -1,20 +1,21 @@
 #include "collision.h"
 
-Collision Collides(Float2 minOne, Float2 maxOne, Float2 minTwo, Float2 maxTwo) {
-  if (maxOne.x < minTwo.x || minOne.x > maxTwo.x ||
-      maxOne.y < minTwo.y || minOne.y > maxTwo.y) {
+Collision Collides(Float2 playerMin, Float2 playerMax, Float2 terrainMin, Float2 terrainMax) {
+  if (playerMax.x < terrainMin.x || terrainMax.x < playerMin.x ||
+      playerMax.y < terrainMin.y || terrainMax.y < playerMin.y) {
     return Collision::NONE;
   }
 
+  float maxFloat = std::numeric_limits<float>::max();
   // Calculate overlap amounts
-  float overlapLeft = abs(minTwo.x - maxOne.x);
-  float overlapRight =  abs(minOne.x - maxTwo.x);
-  float overlapTop = abs(minTwo.y - maxOne.y);
-  float overlapBottom = abs(minOne.y - maxTwo.y);
+  float overlapLeft = terrainMax.x - playerMin.x;
+  float overlapRight =  playerMax.x - terrainMin.x;
+  float overlapTop = terrainMax.y - playerMin.y;
+  float overlapBottom = playerMax.y - terrainMin.y;
   
-  float maxOverlap = std::max({overlapLeft, overlapRight, overlapTop, overlapBottom});
+  float maxOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
 
-  if (maxOverlap < 0.000001f && maxOverlap > -0.000001f) {
+  if (maxOverlap < 0.000001f) {
     return Collision::NONE;
   }
 
