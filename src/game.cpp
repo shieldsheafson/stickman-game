@@ -25,13 +25,13 @@ void Game::CollisionsUpdate() {
         break;
 
       case Collision::LEFTWALL:
-        mPlayer.SetLeft(terrain.GetRight());
+        mPlayer.SetRight(terrain.GetLeft());
         mPlayer.SetVelocityX(0);
         collided = true;
         break;
 
       case Collision::RIGHTWALL:
-        mPlayer.SetRight(terrain.GetLeft());
+        mPlayer.SetLeft(terrain.GetRight());
         mPlayer.SetVelocityX(0);
         collided = true;
         break;

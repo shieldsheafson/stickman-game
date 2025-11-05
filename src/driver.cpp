@@ -67,8 +67,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   Terrain c(Float2(300, 400), 200, 100);
   Terrain d(Float2(700, 700), 100, 200);
   Terrain e(Float2(400, 400), 200, 100);
+  Terrain f(Float2(500, 250), 50, 50);
+  Terrain g(Float2(800, 500), 60, 60);
+  Terrain h(Float2(850, 300), 100, 100);
 
-  std::vector<Terrain> terrain = {a, b, c, d, e};
+  std::vector<Terrain> terrain = {a, b, c, d, e, f, g, h};
   // terrain.push_back(a);
   Level level = Level(terrain);
   std::vector<Level> levels;

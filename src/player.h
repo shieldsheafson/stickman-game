@@ -37,7 +37,7 @@ public:
   Player(): mTexture(NULL) {}
   Player(SDL_Texture *texture, const Float2& position, 
     float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
-    float jumpStrength = 500.0f, float gravity = 1200.0f, 
+    float jumpStrength = 750.0f, float gravity = 1200.0f, 
     float terminalVelocity = 800.0f)
     : mTexture(texture), mTextureHeight(0), mTextureWidth(0),
       mPosition(position), mVelocity(0, 0),
