@@ -8,6 +8,7 @@
 #include "utils.h"
 
 #define SDL_MAIN_USE_CALLBACKS 1
+#include <fstream>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -62,18 +63,24 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
 
   SDL_DestroySurface(surface);  /* done with this, the texture has a copy of the pixels now. */
 
-  Terrain a(Float2(0, 400), 100, 100);
-  Terrain b(Float2(600, 100), 100, 200);
-  Terrain c(Float2(300, 400), 200, 100);
-  Terrain d(Float2(700, 700), 100, 200);
-  Terrain e(Float2(400, 400), 200, 100);
-  Terrain f(Float2(500, 250), 50, 50);
-  Terrain g(Float2(800, 500), 60, 60);
-  Terrain h(Float2(850, 300), 100, 100);
+  // Terrain a(Float2(0, 400), 100, 100);
+  // Terrain b(Float2(600, 100), 100, 200);
+  // Terrain c(Float2(300, 400), 200, 100);
+  // Terrain d(Float2(700, 700), 100, 200);
+  // Terrain e(Float2(400, 400), 200, 100);
+  // Terrain f(Float2(500, 250), 50, 50);
+  // Terrain g(Float2(800, 500), 60, 60);
+  // Terrain h(Float2(850, 300), 100, 100);
 
-  std::vector<Terrain> terrain = {a, b, c, d, e, f, g, h};
+  // std::vector<Terrain> terrain = {a, b, c, d, e, f, g, h};
   // terrain.push_back(a);
-  Level level = Level(terrain);
+  // Level level = Level(terrain);
+  Level level;
+  std::ifstream ifs("../Levels/level1.txt");
+  if (!ifs.is_open()) {
+    throw std::invalid_argument("File did not open");
+  }
+  ifs >> level;
   std::vector<Level> levels;
   levels.push_back(level);
   Player p = Player(texture, Float2(0,0));

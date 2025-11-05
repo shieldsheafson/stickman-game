@@ -23,6 +23,9 @@ class Terrain {
     Terrain(Float2 topLeft, float width, float height): 
        rect{topLeft.x, topLeft.y, width, height} {}
 
+    Terrain(float left, float top, float width, float height): 
+       rect{left, top, width, height} {}
+
     float GetTop() const { return rect.y; }
     float GetBottom() const { return rect.y + rect.h; }
     float GetLeft() const { return rect.x; }
@@ -40,3 +43,6 @@ class Terrain {
       return p.x >= rect.x && p.y >= rect.y && p.x < rect.x + rect.w && p.y < rect.y + rect.h;
     }
 };
+
+std::ostream& operator<<(std::ostream& os, const Terrain& t);
+std::istream& operator>>(std::istream& is, Terrain& t);
