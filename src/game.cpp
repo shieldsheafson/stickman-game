@@ -48,11 +48,8 @@ void Game::CollisionsUpdate() {
 void Game::MovementUpdate(const bool *keystate, float deltaTime) {
   mPlayer.SetMovingLeft(keystate[SDL_SCANCODE_LEFT]);
   mPlayer.SetMovingRight(keystate[SDL_SCANCODE_RIGHT]);
-  if (keystate[SDL_SCANCODE_Z]) {
-    mPlayer.SetJumping(true);
-  } else {
-    mPlayer.SetJumping(false);
-  }
+  mPlayer.SetDucking(keystate[SDL_SCANCODE_DOWN]);
+  mPlayer.SetJumping(keystate[SDL_SCANCODE_Z]);
 
   mPlayer.Update(deltaTime);
 }
@@ -66,7 +63,7 @@ void Game::Update(const bool *keystate, float deltaTime) {
     mPlayer.GetPosition() = Float2(0,0);
   }
 
-  mCamera = mPlayer.GetPosition() - Float2(mWindowWidth/2 - mPlayer.GetWidth() / 2, mWindowHeight/2 - mPlayer.GetHeight() / 2);
+  mCamera = mPlayer.GetPositionForCamera() - Float2(mWindowWidth/2, mWindowHeight/2);
 }
 
 void Game::RenderCurrentLevel(SDL_Renderer *renderer) const {

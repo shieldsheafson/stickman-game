@@ -22,6 +22,12 @@ void Player::UpdateHorizontalVelocity(float deltaTime) {
     return;
   }
 
+  if (mDucking || mSliding) {
+    mSliding = mCurrentSlideTime < mMaxSlideTime && (mMovingLeft || mMovingRight);
+  } else {
+    mCurrentSlideTime = 0.0f;
+  }
+
   float deltaSpeed = mHorizontalAcceleration * deltaTime;
 
   if (mMovingLeft) {
@@ -30,17 +36,27 @@ void Player::UpdateHorizontalVelocity(float deltaTime) {
       mVelocity.x = 0;
     }
 
-    mVelocity.x = std::max(-mMaxHorizontalSpeed, mVelocity.x - deltaSpeed);
+    if (mDucking && mOnGround && !mSliding) {
+      mVelocity.x = std::max(-mMaxHorizontalSpeed/8, mVelocity.x - deltaSpeed);
+    } else {
+      mVelocity.x = std::max(-mMaxHorizontalSpeed, mVelocity.x - deltaSpeed);
+    }
   } else if (mMovingRight) {
     // cancel velocity if moving in opposite direction
     if (mVelocity.x < 0 && mOnGround) {
       mVelocity.x = 0;
     }
 
-    mVelocity.x = std::min(mMaxHorizontalSpeed, mVelocity.x + deltaSpeed);
+    if (mDucking && mOnGround && !mSliding) {
+      mVelocity.x = std::min(mMaxHorizontalSpeed/8, mVelocity.x + deltaSpeed);
+    } else {
+      mVelocity.x = std::min(mMaxHorizontalSpeed, mVelocity.x + deltaSpeed);
+    }
   } else {
     ApplyFriction(deltaTime);
   }
+
+  mCurrentSlideTime += deltaTime;
 }
 
 void Player::ApplyFriction(float deltaTime) {
@@ -54,38 +70,72 @@ void Player::ApplyFriction(float deltaTime) {
 
 void Player::UpdateVerticalVelocity(float deltaTime) {
   float deltaSpeed = mHorizontalAcceleration * deltaTime;
+  float gravityToApply = mGravity;
 
   if (mJumping) {
     if (mOnGround) {
       mVelocity.y = -mJumpStrength;
       mOnGround = false;
-    } else if (mVelocity.y < -mJumpStrength/2) { // still in the middle of jump
-      mVelocity.y -= mJumpStrength * deltaTime; // add a little to the jump
-    } else if (mOnLeftWall) {
+    } else if (mVelocity.y < 0) {
+      gravityToApply *= 0.7;
+    } if (mOnLeftWall && !mWasJumping) {
       mVelocity.y = -mJumpStrength;
       mVelocity.x = -mJumpStrength/2;
-    } else if (mOnRightWall) {
+    } else if (mOnRightWall && !mWasJumping) {
       mVelocity.y = -mJumpStrength;
       mVelocity.x = mJumpStrength/2;
     }
   }
 
-  if (!mOnGround) {
-    mVelocity.y = std::min(mTerminalVelocity, mVelocity.y + mGravity * deltaTime);
+  if (mOnLeftWall || mOnRightWall) {
+    mVelocity.y = std::min(mWallSlideVeloctiy, mVelocity.y + gravityToApply * deltaTime);
+  } else if (!mOnGround) {
+    mVelocity.y = std::min(mTerminalVelocity, mVelocity.y + gravityToApply * deltaTime);
   } else {
     mVelocity.y = std::min(0.0f, mVelocity.y);
   }
-
-  mOnRightWall = false;
-  mOnLeftWall = false;
 }
 
 void Player::UpdatePosition(float deltaTime) {
   mPosition += mVelocity * deltaTime;
 }
 
+void Player::UpdateState() {
+  mOnRightWall = false;
+  mOnLeftWall = false;
+  mWasJumping = mJumping;
+
+  if (mDucking || mSliding) {
+    if (!(mWasDucking || mWasSliding)) {
+      mPosition.y += mTextureHeight / 2;
+    }
+    mCurrentHeight = mTextureHeight / 2;
+  } else {
+    if (mWasDucking || mWasSliding) {
+      mPosition.y -= mTextureHeight / 2;
+    }
+    mCurrentHeight = mTextureHeight;
+  }
+
+  mWasDucking = mDucking;
+  mWasSliding = mSliding;
+}
+
 void Player::Update(float deltaTime) {
   UpdateHorizontalVelocity(deltaTime);
   UpdateVerticalVelocity(deltaTime);
   UpdatePosition(deltaTime);
+  UpdateState();
+}
+
+Float2 Player::GetPositionForCamera() const {
+  Float2 positionForCamera = mPosition;
+  if (mTextureHeight != mCurrentHeight) {
+    positionForCamera.y -= mCurrentHeight;
+  }
+
+  positionForCamera.x -= mTextureWidth/2;
+  positionForCamera.y -= mTextureHeight/2;
+
+  return positionForCamera;
 }

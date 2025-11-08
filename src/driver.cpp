@@ -82,7 +82,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   ifs >> level;
   std::vector<Level> levels;
   levels.push_back(level);
-  Player p = Player(texture, Float2(0,0));
+  Player p = Player(texture, Float2(0,0), 50, 100);
   p.SetOnGround(true);
   game = Game(p, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
 

@@ -21,9 +21,6 @@ x64/
 *.dylib
 *.a
 
-# # SDL library (we'll add as submodule)
-# SDL/
-
 # Generated files
 src/rasterizerconfig.h
 

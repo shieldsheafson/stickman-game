@@ -37,6 +37,5 @@ MIT License - see LICENSE file for details
 
 ## Plan
 1.1 Basic Movement
-1.2 Larger Levels
-1.3 Basic Attacks and Enemies
-1.4 Combos and Attack Based Movement
+1.2 Basic Attacks and Enemies
+1.3 Combos and Attack Based Movement
