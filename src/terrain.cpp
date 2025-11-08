@@ -1,5 +1,13 @@
 #include "terrain.h"
 
+Terrain operator+(const Terrain& lhs, const Float2& rhs) {
+  return Terrain(lhs.GetMin() + rhs, lhs.GetWidth(), lhs.GetHeight());
+}
+
+Terrain operator-(const Terrain& lhs, const Float2& rhs) {
+  return Terrain(lhs.GetMin() - rhs, lhs.GetWidth(), lhs.GetHeight());
+}
+
 std::ostream& operator<<(std::ostream& os, const Terrain& t) {
   os << t.GetLeft() << " " << t.GetTop() << " " << t.GetWidth() << " " << t.GetHeight();
   return os;

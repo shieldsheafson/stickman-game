@@ -38,11 +38,15 @@ class Terrain {
     float GetHeight() const { return rect.h; }
 
     const SDL_FRect* GetSDLRect() const { return &rect; }
+    SDL_FRect GetModifiedSDLRect(const Float2& camera) const { return SDL_FRect{rect.x - camera.x, rect.y - camera.y, rect.w, rect.h}; }
 
     bool Contains(const Float2& p) const {
       return p.x >= rect.x && p.y >= rect.y && p.x < rect.x + rect.w && p.y < rect.y + rect.h;
     }
 };
+
+Terrain operator+(const Terrain& lhs, const Float2& rhs);
+Terrain operator-(const Terrain& lhs, const Float2& rhs);
 
 std::ostream& operator<<(std::ostream& os, const Terrain& t);
 std::istream& operator>>(std::istream& is, Terrain& t);
