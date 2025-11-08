@@ -9,10 +9,12 @@
 #include <vector>
 
 struct Level {
+  float mHeight;
+  float mWidth;
   std::vector<Terrain> mTerrain;
 
   Level() {}
-  Level(const std::vector<Terrain>& terrain): mTerrain(terrain) {}
+  // Level(const std::vector<Terrain>& terrain): mTerrain(terrain) {}
 };
 
 std::ostream& operator<<(std::ostream& os, const Level& l);

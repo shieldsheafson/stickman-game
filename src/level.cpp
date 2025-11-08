@@ -9,10 +9,10 @@ std::ostream& operator<<(std::ostream& os, const Level& l) {
 }
 
 std::istream& operator>>(std::istream& is, Level& l) {
+  is >> l.mWidth >> l.mHeight;
   l.mTerrain.clear();
-  while (is.good()) {
-    float x, y, w, h = 0.0f;
-    is >> x >> y >> w >> h;
+  float x, y, w, h;
+  while (is >> x >> y >> w >> h) {
     l.mTerrain.push_back(Terrain(x, y, w, h));
   }
 
