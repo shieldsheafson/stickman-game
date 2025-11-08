@@ -23,10 +23,13 @@ private:
   
   // State
   bool mOnGround;
+  bool mOnLeftWall;
+  bool mOnRightWall;
   
   // Input state
   bool mMovingLeft;
   bool mMovingRight;
+  bool mJumping;
 
   void UpdateHorizontalVelocity(float deltaTime);
   void UpdateVerticalVelocity(float deltaTime);
@@ -37,16 +40,16 @@ public:
   Player(): mTexture(NULL) {}
   Player(SDL_Texture *texture, const Float2& position, 
     float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
-    float jumpStrength = 750.0f, float gravity = 1200.0f, 
+    float jumpStrength = 550.0f, float gravity = 1200.0f, 
     float terminalVelocity = 800.0f)
     : mTexture(texture), mTextureHeight(0), mTextureWidth(0),
       mPosition(position), mVelocity(0, 0),
       mMaxHorizontalSpeed(maxHorizontalSpeed), 
       mHorizontalAcceleration(horizontalAcceleration), mJumpStrength(jumpStrength),
       mGravity(gravity), mTerminalVelocity(terminalVelocity),
-      mGroundFriction(30), mAirFriction(5),
-      mOnGround(false), mMovingLeft(false),
-      mMovingRight(false) {
+      mGroundFriction(4000), mAirFriction(1000),
+      mOnGround(false), mOnLeftWall(false), mOnRightWall(false), mJumping(false), 
+      mMovingLeft(false), mMovingRight(false) {
         SDL_GetTextureSize(mTexture, &mTextureWidth, &mTextureHeight);
       }
   
@@ -61,9 +64,12 @@ public:
   Float2& GetPosition() { return mPosition; }
   const Float2& GetVelocity() const { return mVelocity; }
   bool IsOnGround() const { return mOnGround; }
+  bool IsOnLeftWall() const { return mOnLeftWall; }
+  bool IsOnRightWall() const { return mOnRightWall; }
 
   void SetMovingLeft(bool movingLeft) { mMovingLeft = movingLeft; }
   void SetMovingRight(bool movingRight) { mMovingRight = movingRight; }
+  void SetJumping(bool jumping) { mJumping = jumping; }
   void MoveRight();
   void MoveLeft();
   void StopHorizontalMovement() {mMovingLeft = false; mMovingRight = false;}
@@ -74,6 +80,8 @@ public:
   void SetLeft(float left) { mPosition.x = left; }
   void SetRight(float right) { mPosition.x = right - mTextureWidth; }
   void SetOnGround(bool onGround) { mOnGround = onGround; }
+  void SetOnLeftWall(bool onLeftWall) { mOnLeftWall = onLeftWall; }
+  void SetOnRightWall(bool onRightWall) { mOnRightWall = onRightWall; }
   void SetVelocityX(float vx) { mVelocity.x = vx; }
   void SetVelocityY(float vy) { mVelocity.y = vy; }
   void SetVelocity(const Float2& velocity) { mVelocity = velocity; }

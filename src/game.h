@@ -13,6 +13,10 @@
 class Game {
   private:
     Player mPlayer;
+    Float2 mCamera;
+
+    float mWindowWidth;
+    float mWindowHeight;
 
     Level mCurrentLevel;
     std::vector<Level> mLevels;
@@ -25,9 +29,10 @@ class Game {
 
   public:
     Game() {}
-    Game(const Player& player, const std::vector<Level>& levels)
-      : mPlayer(player), mLevels(levels) {
+    Game(const Player& player, const std::vector<Level>& levels, float windowWidth, float windowHeight)
+      : mPlayer(player), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
         mCurrentLevel = levels.at(0);
+        mCamera = mPlayer.GetPosition();
       }
 
     const Player& GetPlayer() const { return mPlayer; }

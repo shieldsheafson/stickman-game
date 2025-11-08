@@ -27,12 +27,14 @@ void Game::CollisionsUpdate() {
       case Collision::LEFTWALL:
         mPlayer.SetRight(terrain.GetLeft());
         mPlayer.SetVelocityX(0);
+        mPlayer.SetOnLeftWall(true);
         collided = true;
         break;
 
       case Collision::RIGHTWALL:
         mPlayer.SetLeft(terrain.GetRight());
         mPlayer.SetVelocityX(0);
+        mPlayer.SetOnRightWall(true);
         collided = true;
         break;
     }
@@ -47,7 +49,9 @@ void Game::MovementUpdate(const bool *keystate, float deltaTime) {
   mPlayer.SetMovingLeft(keystate[SDL_SCANCODE_LEFT]);
   mPlayer.SetMovingRight(keystate[SDL_SCANCODE_RIGHT]);
   if (keystate[SDL_SCANCODE_Z]) {
-    mPlayer.Jump();
+    mPlayer.SetJumping(true);
+  } else {
+    mPlayer.SetJumping(false);
   }
 
   mPlayer.Update(deltaTime);
@@ -58,21 +62,24 @@ void Game::Update(const bool *keystate, float deltaTime) {
   CollisionsUpdate();
 
   // hack to keep player on the screen
-  if (mPlayer.GetPosition().y > 750) {
+  if (mPlayer.GetPosition().y > mCurrentLevel.mHeight) {
     mPlayer.GetPosition() = Float2(0,0);
   }
+
+  mCamera = mPlayer.GetPosition() - Float2(mWindowWidth/2 - mPlayer.GetWidth() / 2, mWindowHeight/2 - mPlayer.GetHeight() / 2);
 }
 
 void Game::RenderCurrentLevel(SDL_Renderer *renderer) const {
   for (const Terrain& terrain : mCurrentLevel.mTerrain) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    SDL_RenderFillRect(renderer, terrain.GetSDLRect());
+    SDL_FRect dst_rect = terrain.GetModifiedSDLRect(mCamera);
+    SDL_RenderFillRect(renderer, &dst_rect);
   }
 }
 
 void Game::RenderPlayer(SDL_Renderer *renderer) const {
-  SDL_FRect dst_rect{mPlayer.GetLeft(),
-                     mPlayer.GetTop(), 
+  SDL_FRect dst_rect{mPlayer.GetLeft() - mCamera.x,
+                     mPlayer.GetTop() - mCamera.y, 
                      mPlayer.GetWidth(), 
                      mPlayer.GetHeight()};
 
@@ -85,4 +92,4 @@ void Game::Render(SDL_Renderer *renderer) const {
   RenderPlayer(renderer);
   
   SDL_RenderPresent(renderer);  // actually put it on the screen
-  }
+}

@@ -23,7 +23,9 @@ static int texture_height = 0;
 
 Game game;
 
+static Uint64 firstFrameTime = 0;
 static Uint64 lastFrameTime = 0;
+static float frames = 0;
 
 // Init
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
@@ -77,15 +79,15 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   // Level level = Level(terrain);
   Level level;
   std::ifstream ifs("../Levels/level1.txt");
-  if (!ifs.is_open()) {
-    throw std::invalid_argument("File did not open");
-  }
   ifs >> level;
   std::vector<Level> levels;
   levels.push_back(level);
   Player p = Player(texture, Float2(0,0));
   p.SetOnGround(true);
-  game = Game(p, levels);
+  game = Game(p, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+  lastFrameTime = SDL_GetTicks();
+  SDL_SetRenderVSync(renderer, 1); // prevent screen tearing
   return SDL_APP_CONTINUE;
 }
 
@@ -105,16 +107,26 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   Uint64 currentTime = SDL_GetTicks();
   float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // Convert to seconds
   lastFrameTime = currentTime;
+  if (frames == 0) {
+    firstFrameTime = lastFrameTime;
+  }
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
   
   game.Update(keystate, deltaTime);
   game.Render(renderer);
+  frames++;
   
   return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
-  /* SDL will clean up the window/renderer for us. */
+  float totalSeconds = (lastFrameTime - firstFrameTime) / 1000.0f;
+  float avgFPS = frames / totalSeconds;
+  std::cout << "Frames: " << frames << std::endl;
+  std::cout << "Average FPS: " << avgFPS << std::endl;
+  if (texture) {
+    SDL_DestroyTexture(texture);
+  }
 }

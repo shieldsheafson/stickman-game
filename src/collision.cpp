@@ -6,7 +6,6 @@ Collision Collides(Float2 playerMin, Float2 playerMax, Float2 terrainMin, Float2
     return Collision::NONE;
   }
 
-  float maxFloat = std::numeric_limits<float>::max();
   // Calculate overlap amounts
   float overlapLeft = terrainMax.x - playerMin.x;
   float overlapRight =  playerMax.x - terrainMin.x;
@@ -15,7 +14,8 @@ Collision Collides(Float2 playerMin, Float2 playerMax, Float2 terrainMin, Float2
   
   float maxOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
 
-  if (maxOverlap < 0.000001f) {
+  float epsilon = 0.000001f;
+  if (maxOverlap < epsilon) {
     return Collision::NONE;
   }
 
