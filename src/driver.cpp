@@ -21,7 +21,7 @@ static SDL_Texture *texture = NULL;
 static int texture_width = 0;
 static int texture_height = 0;
 
-Game game;
+static std::optional<Game> game;
 
 static Uint64 firstFrameTime = 0;
 static Uint64 lastFrameTime = 0;
@@ -84,8 +84,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   levels.push_back(level);
   Player p = Player(texture, Float2(0,0), 50, 100);
   p.SetOnGround(true);
-  game = Game(p, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
-
+  game.emplace(texture, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
   lastFrameTime = SDL_GetTicks();
   SDL_SetRenderVSync(renderer, 1); // prevent screen tearing
   return SDL_APP_CONTINUE;
@@ -112,9 +111,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   }
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
-  
-  game.Update(keystate, deltaTime);
-  game.Render(renderer);
+
+  game->Update(keystate, deltaTime);
+  game->Render(renderer);
   frames++;
   
   return SDL_APP_CONTINUE;  /* carry on with the program! */

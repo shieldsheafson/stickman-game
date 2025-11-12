@@ -22,7 +22,7 @@ x64/
 *.a
 
 # Generated files
-src/rasterizerconfig.h
+src/stickmanconfig.h
 
 # OS files
 .DS_Store

@@ -12,28 +12,23 @@ Collision Collides(Float2 playerMin, Float2 playerMax, Float2 terrainMin, Float2
   float overlapTop = terrainMax.y - playerMin.y;
   float overlapBottom = playerMax.y - terrainMin.y;
   
-  float maxOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
-
-  float epsilon = 0.000001f;
-  if (maxOverlap < epsilon) {
-    return Collision::NONE;
-  }
+  float minOverlap = std::min({overlapLeft, overlapRight, overlapTop, overlapBottom});
 
   // Ground collision
-  if (maxOverlap == overlapBottom) {
+  if (minOverlap == overlapBottom) {
     return Collision::GROUND;
   }
   
   // Ceiling collision
-  if (maxOverlap == overlapTop) {
+  if (minOverlap == overlapTop) {
     return Collision::CEILING;
   }
 
   // Left wall collision
-  if (maxOverlap == overlapRight) {
-    return Collision::LEFTWALL;
+  if (minOverlap == overlapRight) {
+    return Collision::RIGHTWALL;
   }
 
   // Right wall collision
-  return Collision::RIGHTWALL;
+  return Collision::LEFTWALL;
 }

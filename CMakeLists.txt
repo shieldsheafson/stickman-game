@@ -28,7 +28,14 @@ target_sources(stickman PRIVATE
     src/player.cpp
     src/terrain.cpp
     src/utils.cpp
-    
+
+    src/playerstates/ducking.cpp
+    src/playerstates/falling.cpp
+    src/playerstates/groundsliding.cpp
+    src/playerstates/jumping.cpp
+    src/playerstates/standing.cpp
+    src/playerstates/wallsliding.cpp
+
     src/collision.h
     src/float2.h
     src/level.h

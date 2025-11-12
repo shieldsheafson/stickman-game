@@ -25,14 +25,14 @@ void Game::CollisionsUpdate() {
         break;
 
       case Collision::LEFTWALL:
-        mPlayer.SetRight(terrain.GetLeft());
+        mPlayer.SetLeft(terrain.GetRight());
         mPlayer.SetVelocityX(0);
         mPlayer.SetOnLeftWall(true);
         collided = true;
         break;
 
       case Collision::RIGHTWALL:
-        mPlayer.SetLeft(terrain.GetRight());
+        mPlayer.SetRight(terrain.GetLeft());
         mPlayer.SetVelocityX(0);
         mPlayer.SetOnRightWall(true);
         collided = true;
@@ -42,6 +42,8 @@ void Game::CollisionsUpdate() {
 
   if (!collided) {
     mPlayer.SetOnGround(false);
+    mPlayer.SetOnLeftWall(false);
+    mPlayer.SetOnRightWall(false);
   }
 }
 
@@ -60,7 +62,7 @@ void Game::Update(const bool *keystate, float deltaTime) {
 
   // hack to keep player on the screen
   if (mPlayer.GetPosition().y > mCurrentLevel.mHeight) {
-    mPlayer.GetPosition() = Float2(0,0);
+    mPlayer.SetPosition(Float2(0,0));
   }
 
   mCamera = mPlayer.GetPositionForCamera() - Float2(mWindowWidth/2, mWindowHeight/2);

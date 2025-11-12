@@ -1,2 +1,1 @@
-// the configured options and settings for Tutorial
 #define STICKMAN_VERSION_STRING "@PROJECT_VERSION@"

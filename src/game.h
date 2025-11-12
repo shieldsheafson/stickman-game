@@ -28,9 +28,9 @@ class Game {
     void RenderPlayer(SDL_Renderer *renderer) const;
 
   public:
-    Game() {}
-    Game(const Player& player, const std::vector<Level>& levels, float windowWidth, float windowHeight)
-      : mPlayer(player), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
+    Game() = delete;
+    Game(SDL_Texture* texture, const std::vector<Level>& levels, float windowWidth, float windowHeight)
+      : mPlayer(texture, Float2(0,0), 50, 100), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
         mCurrentLevel = levels.at(0);
         mCamera = mPlayer.GetPosition();
       }
@@ -40,4 +40,10 @@ class Game {
 
     void Update(const bool *keystate, float deltaTime);
     void Render(SDL_Renderer *renderer) const;
+
+    Game(const Game&) = delete;
+    Game& operator=(const Game&) = delete;
+    Game(Game&&) noexcept = default;
+    Game& operator=(Game&&) noexcept = default;
+    ~Game() = default;
 };
