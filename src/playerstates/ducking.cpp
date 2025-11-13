@@ -11,18 +11,17 @@ void Player::Ducking::OnExit() {
 }
 
 void Player::Ducking::UpdateHorizontalVelocity(float deltaTime) {
-  if (mPlayer.mMovingLeft && mPlayer.mMovingRight) {
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
 
-  float duckSpeedModifier = 0.25;
+  float deltaSpeed = mPlayer.mHorizontalAcceleration * mPlayer.mDuckSpeedModifier * deltaTime;
 
-  float deltaSpeed = mPlayer.mHorizontalAcceleration * duckSpeedModifier * deltaTime;
-
-  if (mPlayer.mMovingLeft) {
-    mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed * duckSpeedModifier, mPlayer.mVelocity.x - deltaSpeed);
-  } else if (mPlayer.mMovingRight) {
-    mPlayer.mVelocity.x = std::min(mPlayer.mMaxHorizontalSpeed * duckSpeedModifier, mPlayer.mVelocity.x + deltaSpeed);
+  if (inputs.mLeftKeyPressed) {
+    mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed * mPlayer.mDuckSpeedModifier, mPlayer.mVelocity.x - deltaSpeed);
+  } else if (inputs.mRightKeyPressed) {
+    mPlayer.mVelocity.x = std::min(mPlayer.mMaxHorizontalSpeed * mPlayer.mDuckSpeedModifier, mPlayer.mVelocity.x + deltaSpeed);
   } else {
     mPlayer.ApplyFriction(deltaTime);
   }
@@ -33,18 +32,18 @@ void Player::Ducking::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::Ducking::ChangeState() {
-  std::cout << StateName() << std::endl;
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (!mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Falling>();
     return;
   } 
   
-  if (mPlayer.mJumping) {
+  if (inputs.mJumpKeyPressed) {
     mPlayer.ChangeStateTo<Jumping>();
     return;
   }
 
-  if (!mPlayer.mDucking) {
+  if (!inputs.mDownKeyPressed) {
     mPlayer.ChangeStateTo<Standing>();
   }
 }

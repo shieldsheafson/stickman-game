@@ -12,13 +12,13 @@ void Player::WallSliding::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::WallSliding::ChangeState() {
-  std::cout << StateName() << std::endl;
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Standing>();
     return;
   }
   
-  if (mPlayer.mJumping && !mWasJumping) {
+  if (inputs.mJumpKeyPressed && !mPlayer.mInputs.GetPreviousInputs().mJumpKeyPressed) {
     mPlayer.ChangeStateTo<Jumping>();
     return;
   }
@@ -28,15 +28,13 @@ void Player::WallSliding::ChangeState() {
     return;
   }
   
-  if (mPlayer.mOnLeftWall && !mPlayer.mMovingLeft) { // on a wall but not moving into it
+  if (mPlayer.mOnLeftWall && !inputs.mLeftKeyPressed) { // on a wall but not moving into it
     mPlayer.ChangeStateTo<Falling>();
     return;
   }
   
-  if (mPlayer.mOnRightWall && !mPlayer.mMovingRight) { // on a wall but not moving into it
+  if (mPlayer.mOnRightWall && !inputs.mRightKeyPressed) { // on a wall but not moving into it
     mPlayer.ChangeStateTo<Falling>();
     return;
   }
-
-  mWasJumping = mWasJumping && mPlayer.mJumping;
 }

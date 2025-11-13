@@ -1,7 +1,8 @@
 #include "player.h"
 
 void Player::Jumping::UpdateHorizontalVelocity(float deltaTime) {
-  if (mPlayer.mMovingLeft && mPlayer.mMovingRight) {
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
 
@@ -13,9 +14,9 @@ void Player::Jumping::UpdateHorizontalVelocity(float deltaTime) {
     mPlayer.mVelocity.x = deltaJumpSpeed;
   } else if (mPlayer.mOnRightWall && !mPlayer.mOnGround) {
     mPlayer.mVelocity.x = -deltaJumpSpeed;
-  } else if (mPlayer.mMovingLeft) {
+  } else if (inputs.mLeftKeyPressed) {
     mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x - deltaSpeed);
-  } else if (mPlayer.mMovingRight) {
+  } else if (inputs.mRightKeyPressed) {
     mPlayer.mVelocity.x = std::min(mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x + deltaSpeed);
   } else {
     mPlayer.ApplyFriction(deltaTime);
@@ -32,7 +33,7 @@ void Player::Jumping::UpdateVerticalVelocity(float deltaTime) {
   } else if (mPlayer.mOnLeftWall || mPlayer.mOnRightWall) {
     mPlayer.mVelocity.y = -mPlayer.mJumpStrength;
   } else {
-    gravityToApply *= 0.7;
+    gravityToApply *= mPlayer.mJumpGravityModifier;
   }
 
   if (!mPlayer.mOnGround) {
@@ -43,13 +44,13 @@ void Player::Jumping::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::Jumping::ChangeState() {
-  std::cout << StateName() << std::endl;
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (mPlayer.mOnLeftWall || mPlayer.mOnRightWall) {
     mPlayer.ChangeStateTo<WallSliding>();
     return;
   }
 
-  if (!mPlayer.mJumping || mPlayer.mVelocity.y > 0) {
+  if (!inputs.mJumpKeyPressed || mPlayer.mVelocity.y > 0) {
     mPlayer.ChangeStateTo<Falling>();
     return;
   }

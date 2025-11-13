@@ -1,5 +1,6 @@
 #pragma once
 #include "float2.h"
+#include "inputmanager.h"
 #include <cmath>
 #include <string>
 #include <SDL3/SDL.h>
@@ -44,11 +45,8 @@ public:
   };
 
   class WallSliding : public State {
-  private:
-    bool mWasJumping = false;
   public:
     using State::State;
-    void OnEnter() override { mWasJumping = mPlayer.mJumping; }
     void UpdateHorizontalVelocity(float deltaTime) override;
     void UpdateVerticalVelocity(float deltaTime) override;
     void ChangeState() override;
@@ -107,15 +105,15 @@ private:
   float mGravity;
   float mTerminalVelocity;
   float mTerminalWallSlideVelocity;
-  float mGroundFriction;
-  float mAirFriction;
-  float mMaxSlideTime;
+  float mGroundFriction = 4000;
+  float mAirFriction = 1000;
+  float mMaxSlideTime = 0.5f;
+  float mDuckSpeedModifier = 0.25f;
+  float mJumpGravityModifier = 0.7f;
+  float mPercentOfMaxSpeedRequiredToSlide = 0.8f;
   
   // Input state (from keyboard input)
-  bool mMovingLeft = false;
-  bool mMovingRight = false;
-  bool mJumping = false;
-  bool mDucking = false;
+  InputManager mInputs;
 
   // Collision state (set by collision detection)
   bool mOnGround = false;
@@ -125,7 +123,7 @@ private:
   // Internal state tracking
   std::unique_ptr<State> mCurrentState;
 
-  bool OpposingVelocity() { return (mMovingLeft && mVelocity.x > 0) || (mMovingRight && mVelocity.x < 0); }
+  bool OpposingVelocity() { return (mInputs.GetInputs().mLeftKeyPressed && mVelocity.x > 0) || (mInputs.GetInputs().mRightKeyPressed && mVelocity.x < 0); }
   void ApplyFriction(float deltaTime);
 
 public:
@@ -139,8 +137,7 @@ public:
       mPosition(position), mVelocity(0, 0),
       mMaxHorizontalSpeed(maxHorizontalSpeed), 
       mHorizontalAcceleration(horizontalAcceleration), mJumpStrength(jumpStrength),
-      mGravity(gravity), mTerminalVelocity(terminalVelocity), mTerminalWallSlideVelocity(terminalVelocity/4),
-      mGroundFriction(4000), mAirFriction(1000), mMaxSlideTime(0.5f) {
+      mGravity(gravity), mTerminalVelocity(terminalVelocity), mTerminalWallSlideVelocity(terminalVelocity/4) {
         if (width == -1 || height == -1) { SDL_GetTextureSize(mTexture, &mTextureWidth, &mTextureHeight); }
         mCurrentWidth = mTextureWidth;
         mCurrentHeight = mTextureHeight;
@@ -178,16 +175,13 @@ public:
   void SetRight(float right) { mPosition.x = right - mCurrentWidth; }
 
   // movement
-  void SetMovingLeft(bool movingLeft) { mMovingLeft = movingLeft; }
-  void SetMovingRight(bool movingRight) { mMovingRight = movingRight; }
-  void SetJumping(bool jumping) { mJumping = jumping; }
-  void SetDucking(bool ducking) { mDucking = ducking; }
   void SetOnGround(bool onGround) { mOnGround = onGround; }
   void SetOnLeftWall(bool onLeftWall) { mOnLeftWall = onLeftWall; }
   void SetOnRightWall(bool onRightWall) { mOnRightWall = onRightWall; }
   void SetVelocityX(float vx) { mVelocity.x = vx; }
   void SetVelocityY(float vy) { mVelocity.y = vy; }
   void SetVelocity(const Float2& velocity) { mVelocity = velocity; }
+  void UpdateInputs(const bool* keystate) { mInputs.Update(keystate); }
   // ----------------------------------------------------------------------------------------------
 
   // misc 

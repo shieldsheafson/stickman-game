@@ -1,7 +1,10 @@
 #include "game.h"
 
 void Game::CollisionsUpdate() {
-  bool collided = false;
+  mPlayer.SetOnGround(false);
+  mPlayer.SetOnLeftWall(false);
+  mPlayer.SetOnRightWall(false);
+
   for (const Terrain& terrain : mCurrentLevel.mTerrain) {
     Float2 playerMin = Float2(mPlayer.GetLeft(), mPlayer.GetTop());
     Float2 playerMax = Float2(mPlayer.GetRight(), mPlayer.GetBottom());
@@ -14,44 +17,31 @@ void Game::CollisionsUpdate() {
         mPlayer.SetBottom(terrain.GetTop());
         mPlayer.SetVelocityY(0);
         mPlayer.SetOnGround(true);
-        collided = true;
         break;
 
       case Collision::CEILING:
         mPlayer.SetTop(terrain.GetBottom());
         mPlayer.SetVelocityY(0);
         mPlayer.SetOnGround(false);
-        collided = true;
         break;
 
       case Collision::LEFTWALL:
         mPlayer.SetLeft(terrain.GetRight());
         mPlayer.SetVelocityX(0);
         mPlayer.SetOnLeftWall(true);
-        collided = true;
         break;
 
       case Collision::RIGHTWALL:
         mPlayer.SetRight(terrain.GetLeft());
         mPlayer.SetVelocityX(0);
         mPlayer.SetOnRightWall(true);
-        collided = true;
         break;
     }
-  }
-
-  if (!collided) {
-    mPlayer.SetOnGround(false);
-    mPlayer.SetOnLeftWall(false);
-    mPlayer.SetOnRightWall(false);
   }
 }
 
 void Game::MovementUpdate(const bool *keystate, float deltaTime) {
-  mPlayer.SetMovingLeft(keystate[SDL_SCANCODE_LEFT]);
-  mPlayer.SetMovingRight(keystate[SDL_SCANCODE_RIGHT]);
-  mPlayer.SetDucking(keystate[SDL_SCANCODE_DOWN]);
-  mPlayer.SetJumping(keystate[SDL_SCANCODE_Z]);
+  mPlayer.UpdateInputs(keystate);
 
   mPlayer.Update(deltaTime);
 }

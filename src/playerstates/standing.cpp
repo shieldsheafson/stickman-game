@@ -1,16 +1,17 @@
 #include "player.h"
 
 void Player::Standing::UpdateHorizontalVelocity(float deltaTime) {
-  if (mPlayer.mMovingLeft && mPlayer.mMovingRight) {
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
 
   float deltaSpeed = mPlayer.mHorizontalAcceleration * deltaTime;
 
-  if (mPlayer.mMovingLeft) {
+  if (inputs.mLeftKeyPressed) {
     if (mPlayer.OpposingVelocity()) { mPlayer.mVelocity.x = 0; }
     mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x - deltaSpeed);
-  } else if (mPlayer.mMovingRight) {
+  } else if (inputs.mRightKeyPressed) {
     if (mPlayer.OpposingVelocity()) { mPlayer.mVelocity.x = 0; }
     mPlayer.mVelocity.x = std::min(mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x + deltaSpeed);
   } else {
@@ -23,19 +24,19 @@ void Player::Standing::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::Standing::ChangeState() {
-  std::cout << StateName() << std::endl;
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (!mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Falling>();
     return;
   }
   
-  if (mPlayer.mJumping) {
+  if (inputs.mJumpKeyPressed) {
     mPlayer.ChangeStateTo<Jumping>();
     return;
   }
 
-  if (mPlayer.mDucking) {
-    if (mPlayer.mVelocity.x >= mPlayer.mMaxHorizontalSpeed * 0.8) {
+  if (inputs.mDownKeyPressed) {
+    if (mPlayer.mVelocity.x >= mPlayer.mMaxHorizontalSpeed * mPlayer.mPercentOfMaxSpeedRequiredToSlide) {
       mPlayer.ChangeStateTo<GroundSliding>();
     } else {
       mPlayer.ChangeStateTo<Ducking>();

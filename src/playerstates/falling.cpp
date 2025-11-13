@@ -1,15 +1,16 @@
 #include "player.h"
 
 void Player::Falling::UpdateHorizontalVelocity(float deltaTime) {
-  if (mPlayer.mMovingLeft && mPlayer.mMovingRight) {
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
 
   float deltaSpeed = mPlayer.mHorizontalAcceleration * deltaTime;
 
-  if (mPlayer.mMovingLeft) {
+  if (inputs.mLeftKeyPressed) {
     mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x - deltaSpeed);
-  } else if (mPlayer.mMovingRight) {
+  } else if (inputs.mRightKeyPressed) {
     mPlayer.mVelocity.x = std::min(mPlayer.mMaxHorizontalSpeed, mPlayer.mVelocity.x + deltaSpeed);
   } else {
     mPlayer.ApplyFriction(deltaTime);
@@ -17,19 +18,17 @@ void Player::Falling::UpdateHorizontalVelocity(float deltaTime) {
 }
 
 void Player::Falling::UpdateVerticalVelocity(float deltaTime) {
-  float deltaSpeed = mPlayer.mHorizontalAcceleration * deltaTime;
-
   mPlayer.mVelocity.y = std::min(mPlayer.mTerminalVelocity, 
                                  mPlayer.mVelocity.y + mPlayer.mGravity * deltaTime);
 }
 
 void Player::Falling::ChangeState() {
-  std::cout << StateName() << std::endl;
+  const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Standing>();
-  } else if (mPlayer.mOnLeftWall && mPlayer.mMovingLeft) {
+  } else if (mPlayer.mOnLeftWall && inputs.mLeftKeyPressed) {
     mPlayer.ChangeStateTo<WallSliding>();
-  } else if (mPlayer.mOnRightWall && mPlayer.mMovingRight) {
+  } else if (mPlayer.mOnRightWall && inputs.mRightKeyPressed) {
     mPlayer.ChangeStateTo<WallSliding>();
   }
 }
