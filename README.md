@@ -36,7 +36,7 @@ Arrow keys to move and z to jump.
 MIT License - see LICENSE file for details
 
 ## Plan
-1.1 Basic Movement__
-1.2 Basic Attacks and Enemies__
-1.3 Combos and Attack Based Movement__
+1.1 Basic Movement
+1.2 Basic Attacks and Enemies
+1.3 Combos and Attack Based Movement
 1.4 Smart Enemies

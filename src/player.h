@@ -30,8 +30,11 @@ public:
   };
 
   class Falling : public State {
+  private:
+    float mCoyoteTime;
   public:
     using State::State;
+    void OnEnter() override;
     void UpdateHorizontalVelocity(float deltaTime) override;
     void UpdateVerticalVelocity(float deltaTime) override;
     void ChangeState() override;
@@ -42,6 +45,7 @@ public:
   class Jumping : public State {
   public:
     using State::State;
+    void OnEnter() override { mPlayer.mVelocity.y = -mPlayer.mJumpStrength; mPlayer.mOnGround = false; }
     void UpdateHorizontalVelocity(float deltaTime) override;
     void UpdateVerticalVelocity(float deltaTime) override;
     void ChangeState() override;
@@ -120,6 +124,7 @@ private:
   float mDuckSpeedModifier = 0.25f;
   float mJumpGravityModifier = 0.7f;
   float mPercentOfMaxSpeedRequiredToSlide = 0.8f;
+  float mCoyoteTime = .2;
   
   // Input state (from keyboard input)
   InputManager mInputs;
@@ -130,6 +135,7 @@ private:
   bool mOnRightWall = false;
 
   std::unique_ptr<State> mCurrentState = nullptr;
+  std::string mPrievousState = "";
   float mTimeTillCanAttack = 0.0f;
 
   std::unique_ptr<Weapon> mWeapon = nullptr;
@@ -201,6 +207,7 @@ public:
   void ChangeStateTo(Args&&... args) {
     static_assert(std::is_base_of_v<State, T>, "T must derive from Player::State");
 
+    mPrievousState = mCurrentState->StateName();
     mCurrentState->OnExit();
     mCurrentState = std::make_unique<T>(*this, std::forward<Args>(args)...);
     mCurrentState->OnEnter();

@@ -24,23 +24,8 @@ void Player::Jumping::UpdateHorizontalVelocity(float deltaTime) {
 }
 
 void Player::Jumping::UpdateVerticalVelocity(float deltaTime) {
-  float deltaSpeed = mPlayer.mHorizontalAcceleration * deltaTime;
-  float gravityToApply = mPlayer.mGravity;
-
-  if (mPlayer.mOnGround) {
-    mPlayer.mVelocity.y = -mPlayer.mJumpStrength;
-    mPlayer.mOnGround = false;
-  } else if (mPlayer.mOnLeftWall || mPlayer.mOnRightWall) {
-    mPlayer.mVelocity.y = -mPlayer.mJumpStrength;
-  } else {
-    gravityToApply *= mPlayer.mJumpGravityModifier;
-  }
-
-  if (!mPlayer.mOnGround) {
-    mPlayer.mVelocity.y = std::min(mPlayer.mTerminalVelocity, mPlayer.mVelocity.y + gravityToApply * deltaTime);
-  } else {
-    mPlayer.mVelocity.y = std::min(0.0f, mPlayer.mVelocity.y);
-  }
+  float gravityToApply = mPlayer.mGravity * mPlayer.mJumpGravityModifier;
+  mPlayer.mVelocity.y = std::min(mPlayer.mTerminalVelocity, mPlayer.mVelocity.y + gravityToApply * deltaTime);
 }
 
 void Player::Jumping::ChangeState() {

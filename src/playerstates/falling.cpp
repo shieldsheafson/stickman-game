@@ -1,5 +1,13 @@
 #include "player.h"
 
+void Player::Falling::OnEnter() {
+  if (mPlayer.mPrievousState != "Jumping") {
+    mCoyoteTime = mPlayer.mCoyoteTime;
+  } else {
+    mCoyoteTime = 0.0f;
+  }
+}
+
 void Player::Falling::UpdateHorizontalVelocity(float deltaTime) {
   const Inputs& inputs = mPlayer.mInputs.GetInputs();
   if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
@@ -20,16 +28,30 @@ void Player::Falling::UpdateHorizontalVelocity(float deltaTime) {
 void Player::Falling::UpdateVerticalVelocity(float deltaTime) {
   mPlayer.mVelocity.y = std::min(mPlayer.mTerminalVelocity, 
                                  mPlayer.mVelocity.y + mPlayer.mGravity * deltaTime);
+
+  mCoyoteTime = std::max(mCoyoteTime - deltaTime, 0.0f);
 }
 
 void Player::Falling::ChangeState() {
   const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  if (mCoyoteTime > 0 && inputs.mJumpKeyPressed && !mPlayer.mInputs.GetPreviousInputs().mJumpKeyPressed) {
+    mPlayer.ChangeStateTo<Jumping>();
+    return;
+  }
+
   if (mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Standing>();
-  } else if (mPlayer.mOnLeftWall && inputs.mLeftKeyPressed) {
+    return;
+  }
+  
+  if (mPlayer.mOnLeftWall && inputs.mLeftKeyPressed) {
     mPlayer.ChangeStateTo<WallSliding>();
-  } else if (mPlayer.mOnRightWall && inputs.mRightKeyPressed) {
+    return;
+  }
+  
+  if (mPlayer.mOnRightWall && inputs.mRightKeyPressed) {
     mPlayer.ChangeStateTo<WallSliding>();
+    return;
   }
 }
 
