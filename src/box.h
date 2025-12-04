@@ -3,27 +3,25 @@
 #include <algorithm>
 #include <cmath>
 
-#include "collision.h"
 #include "float2.h"
-#include "player.h"
 
 #include <SDL3/SDL.h>
 
-class Terrain {
+class Box {
   private:
     SDL_FRect rect;
 
   public:
-    Terrain(Float2 a, Float2 b): 
+    Box(Float2 a, Float2 b): 
     rect{std::min(a.x, b.x), 
          std::min(a.y, b.y), 
          std::abs(b.x - a.x), 
          std::abs(b.y - a.y)} {}
 
-    Terrain(Float2 topLeft, float width, float height): 
+    Box(Float2 topLeft, float width, float height): 
        rect{topLeft.x, topLeft.y, width, height} {}
 
-    Terrain(float left, float top, float width, float height): 
+    Box(float left, float top, float width, float height): 
        rect{left, top, width, height} {}
 
     float GetTop() const { return rect.y; }
@@ -40,13 +38,16 @@ class Terrain {
     const SDL_FRect* GetSDLRect() const { return &rect; }
     SDL_FRect GetModifiedSDLRect(const Float2& camera) const { return SDL_FRect{rect.x - camera.x, rect.y - camera.y, rect.w, rect.h}; }
 
+    Box& operator+=(const Float2& rhs);
+    Box& operator-=(const Float2& rhs);
+
     bool Contains(const Float2& p) const {
       return p.x >= rect.x && p.y >= rect.y && p.x < rect.x + rect.w && p.y < rect.y + rect.h;
     }
 };
 
-Terrain operator+(const Terrain& lhs, const Float2& rhs);
-Terrain operator-(const Terrain& lhs, const Float2& rhs);
+Box operator+(const Box& lhs, const Float2& rhs);
+Box operator-(const Box& lhs, const Float2& rhs);
 
-std::ostream& operator<<(std::ostream& os, const Terrain& t);
-std::istream& operator>>(std::istream& is, Terrain& t);
+std::ostream& operator<<(std::ostream& os, const Box& t);
+std::istream& operator>>(std::istream& is, Box& t);

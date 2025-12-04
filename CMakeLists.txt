@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(stickman VERSION 1.1)
+project(stickman VERSION 1.2)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,13 +20,13 @@ add_executable(stickman)
 
 # Add all source files
 target_sources(stickman PRIVATE
+    src/box.cpp
     src/collision.cpp 
     src/driver.cpp
     src/float2.cpp
     src/game.cpp
     src/level.cpp
     src/player.cpp
-    src/terrain.cpp
     src/utils.cpp
 
     src/playerstates/ducking.cpp
@@ -36,12 +36,16 @@ target_sources(stickman PRIVATE
     src/playerstates/standing.cpp
     src/playerstates/wallsliding.cpp
 
+    src/attack.h
+    src/box.h
     src/collision.h
+    src/direction.h
     src/float2.h
+    src/inputmanager.h
     src/level.h
     src/player.h
-    src/terrain.h
     src/utils.h
+    src/weapon.h
 
     # Generated header
     ${CMAKE_BINARY_DIR}/src/stickmanconfig.h

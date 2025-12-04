@@ -3,7 +3,7 @@
 #include "collision.h"
 #include "float2.h"
 #include "player.h"
-#include "terrain.h"
+#include "box.h"
 
 #include <iostream>
 #include <vector>
@@ -11,10 +11,9 @@
 struct Level {
   float mHeight;
   float mWidth;
-  std::vector<Terrain> mTerrain;
+  std::vector<Box> mTerrain;
 
   Level() {}
-  // Level(const std::vector<Terrain>& terrain): mTerrain(terrain) {}
 };
 
 std::ostream& operator<<(std::ostream& os, const Level& l);

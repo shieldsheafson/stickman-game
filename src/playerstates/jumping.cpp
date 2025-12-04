@@ -55,3 +55,16 @@ void Player::Jumping::ChangeState() {
     return;
   }
 }
+
+std::unique_ptr<Attack> Player::Jumping::GetAttack() {
+  std::unique_ptr<Attack> attack = mPlayer.mWeapon->GetAttack();
+
+  // idk what the best way to format this tbh, not sure the ternary operator is the move
+  Float2 front = mPlayer.mInputs.GetDirection() == Direction::RIGHT
+    ? Float2(mPlayer.GetFront() + mPlayer.mWeapon->GetOffset(), mPlayer.GetTop())
+    : Float2(mPlayer.GetFront() - mPlayer.mWeapon->GetOffset(), mPlayer.GetTop());
+
+  attack->Transform(front, mPlayer.mInputs.GetDirection());
+
+  return attack;
+}

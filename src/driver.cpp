@@ -3,9 +3,7 @@
 #include "float2.h"
 #include "game.h"
 #include "level.h"
-#include "player.h"
-#include "terrain.h"
-#include "utils.h"
+#include "box.h"
 
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <fstream>
@@ -26,6 +24,8 @@ static std::optional<Game> game;
 static Uint64 firstFrameTime = 0;
 static Uint64 lastFrameTime = 0;
 static float frames = 0;
+
+static bool paused = false;
 
 // Init
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
@@ -82,8 +82,6 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   ifs >> level;
   std::vector<Level> levels;
   levels.push_back(level);
-  Player p = Player(texture, Float2(0,0), 50, 100);
-  p.SetOnGround(true);
   game.emplace(texture, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
   lastFrameTime = SDL_GetTicks();
   SDL_SetRenderVSync(renderer, 1); // prevent screen tearing
@@ -95,11 +93,24 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
   if (event->type == SDL_EVENT_QUIT) {
     return SDL_APP_SUCCESS;  // Exit gracefully
   }
+  if (event->type == SDL_EVENT_KEY_DOWN) {
+    if (event->key.scancode == SDL_SCANCODE_SPACE) {
+      paused = !paused;
+    }
+  }
   return SDL_APP_CONTINUE;
 }
 
 // Runs once each frame
 SDL_AppResult SDL_AppIterate(void *appstate) {
+  if (paused) {
+    // Uint64 currentTime = SDL_GetTicks();
+    // float deltaTime = (currentTime - lastFrameTime) / 1000.0f; // Convert to seconds
+    // lastFrameTime = currentTime;
+    // pausedTime += deltaTime;
+    return SDL_APP_CONTINUE;
+  }
+
   SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
   SDL_RenderClear(renderer);
 
@@ -111,7 +122,6 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
   }
   
   const bool *keystate = SDL_GetKeyboardState(NULL);
-
   game->Update(keystate, deltaTime);
   game->Render(renderer);
   frames++;
@@ -124,7 +134,7 @@ void SDL_AppQuit(void *appstate, SDL_AppResult result)
   float totalSeconds = (lastFrameTime - firstFrameTime) / 1000.0f;
   float avgFPS = frames / totalSeconds;
   std::cout << "Frames: " << frames << std::endl;
-  std::cout << "Average FPS: " << avgFPS << std::endl;
+  std::cout << "Average FPS: " << avgFPS << " *currently broken if you pause" << std::endl;
   if (texture) {
     SDL_DestroyTexture(texture);
   }

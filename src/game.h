@@ -3,26 +3,30 @@
 #include "float2.h"
 #include "level.h"
 #include "player.h"
-#include "terrain.h"
-#include "utils.h"
+#include "box.h"
+#include "attack.h"
 
+#include <list>
+#include <memory>
 #include <vector>
 
 #include <SDL3/SDL.h>
 
 class Game {
   private:
+    int a = 0;
     Player mPlayer;
     Float2 mCamera;
 
     float mWindowWidth;
     float mWindowHeight;
 
-    Level mCurrentLevel;
+    int mCurrentLevelIndex = 0;
     std::vector<Level> mLevels;
+    std::list<std::unique_ptr<Attack> > mAttacks;
 
-    void MovementUpdate(const bool *keystate, float deltaTime);
-    void CollisionsUpdate();
+    void UpdateMovement(const bool *keystate, float deltaTime);
+    void UpdateCollisions();
 
     void RenderCurrentLevel(SDL_Renderer *renderer) const;
     void RenderPlayer(SDL_Renderer *renderer) const;
@@ -30,16 +34,15 @@ class Game {
   public:
     Game() = delete;
     Game(SDL_Texture* texture, const std::vector<Level>& levels, float windowWidth, float windowHeight)
-      : mPlayer(texture, Float2(0,0), 50, 100), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
-        mCurrentLevel = levels.at(0);
+      : mPlayer(texture, Float2(0,0), 50, 99), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
         mCamera = mPlayer.GetPosition();
       }
 
     const Player& GetPlayer() const { return mPlayer; }
-    const Level& GetLevel() const { return mCurrentLevel; }
+    const Level& GetLevel() const { return mLevels[mCurrentLevelIndex]; }
 
     void Update(const bool *keystate, float deltaTime);
-    void Render(SDL_Renderer *renderer) const;
+    void Render(SDL_Renderer *renderer);
 
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;

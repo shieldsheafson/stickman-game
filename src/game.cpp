@@ -1,11 +1,11 @@
 #include "game.h"
 
-void Game::CollisionsUpdate() {
+void Game::UpdateCollisions() {
   mPlayer.SetOnGround(false);
   mPlayer.SetOnLeftWall(false);
   mPlayer.SetOnRightWall(false);
 
-  for (const Terrain& terrain : mCurrentLevel.mTerrain) {
+  for (const Box& terrain : mLevels[mCurrentLevelIndex].mTerrain) {
     Float2 playerMin = Float2(mPlayer.GetLeft(), mPlayer.GetTop());
     Float2 playerMax = Float2(mPlayer.GetRight(), mPlayer.GetBottom());
     Collision collision = Collides(playerMin, playerMax, terrain.GetMin(), terrain.GetMax());
@@ -40,18 +40,24 @@ void Game::CollisionsUpdate() {
   }
 }
 
-void Game::MovementUpdate(const bool *keystate, float deltaTime) {
-  mPlayer.UpdateInputs(keystate);
-
-  mPlayer.Update(deltaTime);
+void Game::UpdateMovement(const bool *keystate, float deltaTime) {
+  std::unique_ptr<Attack> currentPlayerAttack = mPlayer.Update(deltaTime, keystate);
+  if (currentPlayerAttack) {
+    mAttacks.push_back(std::move(currentPlayerAttack));
+  }
 }
 
 void Game::Update(const bool *keystate, float deltaTime) {
-  MovementUpdate(keystate, deltaTime);
-  CollisionsUpdate();
+  UpdateMovement(keystate, deltaTime);
+  UpdateCollisions();
+
+  // Update Attacks
+  for (auto& attack : mAttacks) {
+    attack->Update(deltaTime);
+  }
 
   // hack to keep player on the screen
-  if (mPlayer.GetPosition().y > mCurrentLevel.mHeight) {
+  if (mPlayer.GetPosition().y > mLevels[mCurrentLevelIndex].mHeight) {
     mPlayer.SetPosition(Float2(0,0));
   }
 
@@ -59,7 +65,7 @@ void Game::Update(const bool *keystate, float deltaTime) {
 }
 
 void Game::RenderCurrentLevel(SDL_Renderer *renderer) const {
-  for (const Terrain& terrain : mCurrentLevel.mTerrain) {
+  for (const Box& terrain : mLevels[mCurrentLevelIndex].mTerrain) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_FRect dst_rect = terrain.GetModifiedSDLRect(mCamera);
     SDL_RenderFillRect(renderer, &dst_rect);
@@ -76,9 +82,22 @@ void Game::RenderPlayer(SDL_Renderer *renderer) const {
   SDL_RenderTexture(renderer, mPlayer.GetTexture(), NULL, &dst_rect);
 }
 
-void Game::Render(SDL_Renderer *renderer) const {
+void Game::Render(SDL_Renderer *renderer) {
   RenderCurrentLevel(renderer);
   RenderPlayer(renderer);
+
+  for (auto it = mAttacks.begin(); it != mAttacks.end(); ) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    const Box* currentFrame = (*it)->GetCurrentFrame();
+    
+    if (currentFrame) {
+      SDL_FRect dst_rect = currentFrame->GetModifiedSDLRect(mCamera);
+      SDL_RenderFillRect(renderer, &dst_rect);
+      ++it;
+    } else {
+      it = mAttacks.erase(it);
+    }
+  }
   
   SDL_RenderPresent(renderer);  // actually put it on the screen
 }

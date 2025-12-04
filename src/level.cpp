@@ -1,7 +1,7 @@
 #include "level.h"
 
 std::ostream& operator<<(std::ostream& os, const Level& l) {
-  for (const Terrain& t : l.mTerrain) {
+  for (const Box& t : l.mTerrain) {
     os << t << "\n";
   }
 
@@ -13,7 +13,7 @@ std::istream& operator>>(std::istream& is, Level& l) {
   l.mTerrain.clear();
   float x, y, w, h;
   while (is >> x >> y >> w >> h) {
-    l.mTerrain.push_back(Terrain(x, y, w, h));
+    l.mTerrain.push_back(Box(x, y, w, h));
   }
 
   return is;

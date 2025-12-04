@@ -9,11 +9,26 @@ void Player::ApplyFriction(float deltaTime) {
   }
 }
 
-void Player::Update(float deltaTime) {
+std::unique_ptr<Attack> Player::Update(float deltaTime, const bool* keystate) {
+  mInputs.Update(keystate);
   mCurrentState->ChangeState();
   mCurrentState->UpdateHorizontalVelocity(deltaTime);
   mCurrentState->UpdateVerticalVelocity(deltaTime);
   mCurrentState->UpdatePosition(deltaTime);
+
+  std::unique_ptr<Attack> attack = nullptr;
+
+  if (mInputs.GetInputs().mAttackKeyPressed && mTimeTillCanAttack == 0.0f) {
+    attack = mCurrentState->GetAttack();
+  }
+
+  if (attack) {
+    mTimeTillCanAttack = attack->GetLengthOfAttack();
+  } else {
+    mTimeTillCanAttack = std::max(0.0f, mTimeTillCanAttack - deltaTime);
+  }
+
+  return attack;
 }
 
 Float2 Player::GetPositionForCamera() const {
