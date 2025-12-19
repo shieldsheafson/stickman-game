@@ -36,7 +36,7 @@ void Player::Standing::ChangeState() {
   }
 
   if (inputs.mDownKeyPressed) {
-    if (mPlayer.mVelocity.x >= mPlayer.mMaxHorizontalSpeed * mPlayer.mPercentOfMaxSpeedRequiredToSlide) {
+    if (std::abs(mPlayer.mVelocity.x) >= mPlayer.mMaxHorizontalSpeed * mPlayer.mPercentOfMaxSpeedRequiredToSlide) {
       mPlayer.ChangeStateTo<GroundSliding>();
     } else {
       mPlayer.ChangeStateTo<Ducking>();
