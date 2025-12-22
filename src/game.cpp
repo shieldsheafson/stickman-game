@@ -4,6 +4,7 @@ void Game::UpdateCollisions() {
   mPlayer.SetOnGround(false);
   mPlayer.SetOnLeftWall(false);
   mPlayer.SetOnRightWall(false);
+  mPlayer.SetForceDuck(false);
 
   for (const Box& terrain : mLevels[mCurrentLevelIndex].mTerrain) {
     Float2 playerMin = Float2(mPlayer.GetLeft(), mPlayer.GetTop());
@@ -36,6 +37,12 @@ void Game::UpdateCollisions() {
         mPlayer.SetVelocityX(0);
         mPlayer.SetOnRightWall(true);
         break;
+    }
+
+    Float2 baseTopLeft = Float2(mPlayer.GetLeft(), mPlayer.GetBaseTop());
+    Float2 baseTopRight = Float2(mPlayer.GetRight(), mPlayer.GetBaseTop());
+    if (terrain.Contains(baseTopLeft) || terrain.Contains(baseTopRight)) {
+      mPlayer.SetForceDuck(true);
     }
   }
 }

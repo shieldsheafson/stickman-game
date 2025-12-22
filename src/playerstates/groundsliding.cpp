@@ -40,13 +40,13 @@ void Player::GroundSliding::ChangeState() {
     return;
   } 
   
-  if (inputs.mJumpKeyPressed) {
+  if (inputs.mJumpKeyPressed && !mPlayer.mForceDuck) {
     mPlayer.ChangeStateTo<Jumping>();
     return;
   }
 
   if (mSlideTime > mPlayer.mMaxSlideTime || mPlayer.mVelocity.x == 0 || mPlayer.OpposingVelocity()) {
-    if (inputs.mDownKeyPressed) {
+    if (inputs.mDownKeyPressed || mPlayer.mForceDuck) {
       mPlayer.ChangeStateTo<Ducking>();
     } else {
       mPlayer.ChangeStateTo<Standing>();

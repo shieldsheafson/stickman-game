@@ -133,6 +133,7 @@ private:
   bool mOnGround = false;
   bool mOnLeftWall = false;
   bool mOnRightWall = false;
+  bool mForceDuck = false;
 
   std::unique_ptr<State> mCurrentState = nullptr;
   std::string mPrievousState = "";
@@ -170,6 +171,7 @@ public:
   Float2 GetPositionForCamera() const;
   float GetBottom() const { return mPosition.y + mCurrentHeight; }
   float GetTop() const { return mPosition.y; }
+  float GetBaseTop() const;
   float GetLeft() const { return mPosition.x; }
   float GetRight() const { return mPosition.x + mCurrentWidth; }
   float GetFront() const { return mInputs.GetDirection() == Direction::LEFT ? GetLeft() : GetRight(); }
@@ -197,6 +199,7 @@ public:
   void SetOnGround(bool onGround) { mOnGround = onGround; }
   void SetOnLeftWall(bool onLeftWall) { mOnLeftWall = onLeftWall; }
   void SetOnRightWall(bool onRightWall) { mOnRightWall = onRightWall; }
+  void SetForceDuck(bool forceDuck) { mForceDuck = forceDuck; }
   void SetVelocityX(float vx) { mVelocity.x = vx; }
   void SetVelocityY(float vy) { mVelocity.y = vy; }
   void SetVelocity(const Float2& velocity) { mVelocity = velocity; }

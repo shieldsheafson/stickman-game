@@ -5,7 +5,6 @@
 
 #include "direction.h"
 #include "box.h"
-#include "utils.h"
 
 struct Attack {
   std::vector<Box> mHitboxes;

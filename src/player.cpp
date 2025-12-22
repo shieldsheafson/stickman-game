@@ -1,5 +1,12 @@
 #include "player.h"
 
+float Player::GetBaseTop() const  {
+  if (mTextureHeight != mCurrentHeight) {
+    return mPosition.y - mTextureHeight / 2;
+  }
+  return GetTop();
+}
+
 void Player::ApplyFriction(float deltaTime) {
   float friction = (mOnGround ? mGroundFriction : mAirFriction) * deltaTime;
   if (std::abs(mVelocity.x) <= friction) {

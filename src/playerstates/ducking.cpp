@@ -18,6 +18,10 @@ void Player::Ducking::UpdateHorizontalVelocity(float deltaTime) {
 
   float deltaSpeed = mPlayer.mHorizontalAcceleration * mPlayer.mDuckSpeedModifier * deltaTime;
 
+  if (mPlayer.OpposingVelocity()) {
+    mPlayer.mVelocity.x = 0;
+  }
+
   if (inputs.mLeftKeyPressed) {
     mPlayer.mVelocity.x = std::max(-mPlayer.mMaxHorizontalSpeed * mPlayer.mDuckSpeedModifier, mPlayer.mVelocity.x - deltaSpeed);
   } else if (inputs.mRightKeyPressed) {
@@ -37,6 +41,10 @@ void Player::Ducking::ChangeState() {
     mPlayer.ChangeStateTo<Falling>();
     return;
   } 
+
+  if (mPlayer.mForceDuck) {
+    return;
+  }
   
   if (inputs.mJumpKeyPressed) {
     mPlayer.ChangeStateTo<Jumping>();
