@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 
+#include "collision.h"
 #include "float2.h"
 
 #include <SDL3/SDL.h>
@@ -44,6 +45,8 @@ class Box {
     bool Contains(const Float2& p) const {
       return p.x >= rect.x && p.y >= rect.y && p.x < rect.x + rect.w && p.y < rect.y + rect.h;
     }
+
+    Collision Collides(const Box& other) const;
 };
 
 Box operator+(const Box& lhs, const Float2& rhs);

@@ -29,6 +29,7 @@ add_executable(stickman)
 
 # Add all source files
 target_sources(stickman PRIVATE
+    src/attack.cpp
     src/box.cpp
     src/collision.cpp
     src/debugframe.cpp

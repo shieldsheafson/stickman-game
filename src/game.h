@@ -17,9 +17,8 @@
 
 class Game {
   private:
-    int a = 0;
     Player mPlayer;
-    std::vector<std::unique_ptr<Enemy> > mEnemies;
+    std::list<std::unique_ptr<Enemy> > mEnemies;
     Float2 mCamera;
 
     float mWindowWidth;
@@ -27,12 +26,14 @@ class Game {
 
     int mCurrentLevelIndex = 1;
     std::vector<Level> mLevels;
-    std::list<std::unique_ptr<Attack> > mAttacks;
+    std::list<std::unique_ptr<Attack> > mPlayerAttacks;
+    std::list<std::unique_ptr<Attack> > mEnemyAttacks;
 
     void UpdateMovement(const Inputs& inputs, float deltaTime);
     void UpdateEnemies(float deltaTime);
     void UpdateCollisions();
     void CheckCollision(const Box& terrain, Entity* entity);
+    void UpdateAttacks(float deltaTime);
 
     void RenderCurrentLevel(SDL_Renderer *renderer) const;
     void RenderPlayer(SDL_Renderer *renderer) const;
@@ -41,11 +42,11 @@ class Game {
   public:
     Game() = delete;
     Game(SDL_Texture* texture, const std::vector<Level>& levels, float windowWidth, float windowHeight)
-      : mPlayer(texture, Float2(0,0), 50, 99), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
+      : mPlayer(texture, Float2(0,0), 10, 50, 99), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
         Float2 spawn = mLevels.at(mCurrentLevelIndex).mSpawn;
         mPlayer.SetPosition(Float2(spawn.x, spawn.y - mPlayer.GetHeight()));
         mCamera = mPlayer.GetPosition();
-        mEnemies.push_back(std::make_unique<Enemy>(texture, Float2(1000,1700), 50, 99));
+        mEnemies.push_back(std::make_unique<Enemy>(texture, Float2(1000,1700), 10, 50, 99));
         UpdateCollisions();
       }
 

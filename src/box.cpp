@@ -1,5 +1,9 @@
 #include "box.h"
 
+Collision Box::Collides(const Box& other) const {
+  return ::Collides(GetMin(), GetMax(), other.GetMin(), other.GetMax());
+}
+
 Box& Box::operator+=(const Float2& rhs) {
   rect.x += rhs.x;
   rect.y += rhs.y;

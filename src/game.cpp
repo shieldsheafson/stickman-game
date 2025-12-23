@@ -1,5 +1,24 @@
 #include "game.h"
 
+void Game::UpdateAttacks(float deltaTime) {
+  for (auto& enemy : mEnemies) {
+    for (auto& attack : mPlayerAttacks) {
+      if (enemy->AttackHits(attack.get())) {
+        enemy->DealDamage(attack->mDamage);
+        attack->End();
+      }
+    }
+  }
+
+  for (auto& attack : mPlayerAttacks) {
+    attack->Update(deltaTime);
+  }
+
+  for (auto& attack : mEnemyAttacks) {
+    attack->Update(deltaTime);
+  }
+}
+
 void Game::CheckCollision(const Box& terrain, Entity* entity) {
   Float2 entityMin = Float2(entity->GetLeft(), entity->GetTop());
   Float2 entityMax = Float2(entity->GetRight(), entity->GetBottom());
@@ -65,17 +84,23 @@ void Game::UpdateCollisions() {
 void Game::UpdateMovement(const Inputs& inputs, float deltaTime) {
   std::unique_ptr<Attack> currentPlayerAttack = mPlayer.Update(inputs, deltaTime);
   if (currentPlayerAttack) {
-    mAttacks.push_back(std::move(currentPlayerAttack));
+    mPlayerAttacks.push_back(std::move(currentPlayerAttack));
   }
 }
 
 void Game::UpdateEnemies(float deltaTime) {
-  for (auto& enemy : mEnemies) {
+  for (auto it = mEnemies.begin(); it != mEnemies.end(); ) {
+    auto& enemy = *it;
+    if (enemy->GetHealth() <= 0) {
+      it = mEnemies.erase(it);
+      continue;
+    }
     Inputs inputs;
     std::unique_ptr<Attack> currentEnemyAttack = enemy->Update(inputs, deltaTime);
     if (currentEnemyAttack) {
-      mAttacks.push_back(std::move(currentEnemyAttack));
+      mEnemyAttacks.push_back(std::move(currentEnemyAttack));
     }
+    ++it;
   }
 }
 
@@ -84,11 +109,7 @@ void Game::Update(const Inputs& inputs, float deltaTime) {
   UpdateMovement(inputs, deltaTime);
   UpdateEnemies(deltaTime);
   UpdateCollisions();
-
-  // Update Attacks
-  for (auto& attack : mAttacks) {
-    attack->Update(deltaTime);
-  }
+  UpdateAttacks(deltaTime);
 
   // hack to keep player on the screen
   if (mPlayer.GetPosition().y > mLevels[mCurrentLevelIndex].mHeight) {
@@ -134,7 +155,7 @@ void Game::Render(SDL_Renderer *renderer) {
   RenderEnemies(renderer);
   RenderPlayer(renderer);
 
-  for (auto it = mAttacks.begin(); it != mAttacks.end(); ) {
+  for (auto it = mPlayerAttacks.begin(); it != mPlayerAttacks.end(); ) {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     const Box* currentFrame = (*it)->GetCurrentFrame();
     
@@ -143,7 +164,7 @@ void Game::Render(SDL_Renderer *renderer) {
       SDL_RenderFillRect(renderer, &dst_rect);
       ++it;
     } else {
-      it = mAttacks.erase(it);
+      it = mPlayerAttacks.erase(it);
     }
   }
   

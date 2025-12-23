@@ -110,6 +110,8 @@ private:
 
   Float2 mPosition;
   Float2 mVelocity = Float2(0.0f, 0.0f);
+
+  int mHealth;
   
   // Movement parameters
   float mMaxHorizontalSpeed;
@@ -146,13 +148,13 @@ private:
 
 public:
   Entity() = delete;
-  Entity(SDL_Texture *texture, const Float2& position, float width = -1, float height = -1,
+  Entity(SDL_Texture *texture, const Float2& position, int health, float width = -1, float height = -1,
          float maxHorizontalSpeed = 300.0f, float horizontalAcceleration = 1000.f, 
          float jumpStrength = 550.0f, float gravity = 1200.0f, 
          float terminalVelocity = 800.0f)
     : mTexture(texture), mPosition(position), 
       mTextureWidth(width), mTextureHeight(height), 
-      mMaxHorizontalSpeed(maxHorizontalSpeed), 
+      mHealth(health), mMaxHorizontalSpeed(maxHorizontalSpeed), 
       mHorizontalAcceleration(horizontalAcceleration), mJumpStrength(jumpStrength),
       mGravity(gravity), mTerminalVelocity(terminalVelocity), mTerminalWallSlideVelocity(terminalVelocity/4) {
         if (width == -1 || height == -1) { SDL_GetTextureSize(mTexture, &mTextureWidth, &mTextureHeight); }
@@ -176,6 +178,10 @@ public:
   float GetFront() const { return mInputManager.GetDirection() == Direction::LEFT ? GetLeft() : GetRight(); }
   float GetWidth() const { return mCurrentWidth; }
   float GetHeight() const { return mCurrentHeight; }
+  Float2 GetTopLeft() const { return Float2(GetLeft(), GetTop()); }
+  Float2 GetTopRight() const { return Float2(GetRight(), GetTop()); }
+  Float2 GetBottomLeft() const { return Float2(GetLeft(), GetBottom()); }
+  Float2 GetBottomRight() const { return Float2(GetRight(), GetBottom()); }
 
   const std::unique_ptr<State>& GetState() const { return mCurrentState; }
 
@@ -204,6 +210,9 @@ public:
   void SetVelocity(const Float2& velocity) { mVelocity = velocity; }
   // ----------------------------------------------------------------------------------------------
 
+  bool AttackHits(const Attack* const attack) const;
+  void DealDamage(int damage) { mHealth -= damage; }
+  int GetHealth() const { return mHealth; }
   // misc 
   template<typename T, typename... Args>
   void ChangeStateTo(Args&&... args) {

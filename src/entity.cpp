@@ -37,3 +37,13 @@ std::unique_ptr<Attack> Entity::Update(const Inputs& inputs, float deltaTime) {
 
   return attack;
 }
+
+bool Entity::AttackHits(const Attack* const attack) const {
+  const Box* const hitbox = attack->GetCurrentFrame();
+  if (hitbox->Contains(GetTopLeft())) { return true; }
+  if (hitbox->Contains(GetTopRight())) { return true; }
+  if (hitbox->Contains(GetBottomLeft())) { return true; }
+  if (hitbox->Contains(GetBottomRight())) { return true; }
+
+  return false;
+}
