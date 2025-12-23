@@ -1,3 +1,8 @@
 #pragma once
 
-class Enemy {};
+#include "entity.h"
+
+class Enemy : public Entity {
+public:
+  using Entity::Entity;
+};

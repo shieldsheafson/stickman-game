@@ -1,48 +1,63 @@
 #include "game.h"
 
+void Game::CheckCollision(const Box& terrain, Entity* entity) {
+  Float2 entityMin = Float2(entity->GetLeft(), entity->GetTop());
+  Float2 entityMax = Float2(entity->GetRight(), entity->GetBottom());
+  Collision collision = Collides(entityMin, entityMax, terrain.GetMin(), terrain.GetMax());
+  switch (collision) {
+    case Collision::NONE:
+      break;
+
+    case Collision::GROUND:
+      entity->SetBottom(terrain.GetTop());
+      entity->SetVelocityY(0);
+      entity->SetOnGround(true);
+      break;
+
+    case Collision::CEILING:
+      entity->SetTop(terrain.GetBottom());
+      entity->SetVelocityY(0);
+      entity->SetOnGround(false);
+      break;
+
+    case Collision::LEFTWALL:
+      entity->SetLeft(terrain.GetRight());
+      entity->SetVelocityX(0);
+      entity->SetOnLeftWall(true);
+      break;
+
+    case Collision::RIGHTWALL:
+      entity->SetRight(terrain.GetLeft());
+      entity->SetVelocityX(0);
+      entity->SetOnRightWall(true);
+      break;
+  }
+
+  Float2 baseTopLeft = Float2(entity->GetLeft(), entity->GetBaseTop());
+  Float2 baseTopRight = Float2(entity->GetRight(), entity->GetBaseTop());
+  if (terrain.Contains(baseTopLeft) || terrain.Contains(baseTopRight)) {
+    entity->SetForceDuck(true);
+  }
+}
+
 void Game::UpdateCollisions() {
   mPlayer.SetOnGround(false);
   mPlayer.SetOnLeftWall(false);
   mPlayer.SetOnRightWall(false);
   mPlayer.SetForceDuck(false);
 
+  for (auto& enemy : mEnemies) {
+    enemy->SetOnGround(false);
+    enemy->SetOnLeftWall(false);
+    enemy->SetOnRightWall(false);
+    enemy->SetForceDuck(false);
+  }
+
   for (const Box& terrain : mLevels[mCurrentLevelIndex].mTerrain) {
-    Float2 playerMin = Float2(mPlayer.GetLeft(), mPlayer.GetTop());
-    Float2 playerMax = Float2(mPlayer.GetRight(), mPlayer.GetBottom());
-    Collision collision = Collides(playerMin, playerMax, terrain.GetMin(), terrain.GetMax());
-    switch (collision) {
-      case Collision::NONE:
-        break;
+    CheckCollision(terrain, &mPlayer);
 
-      case Collision::GROUND:
-        mPlayer.SetBottom(terrain.GetTop());
-        mPlayer.SetVelocityY(0);
-        mPlayer.SetOnGround(true);
-        break;
-
-      case Collision::CEILING:
-        mPlayer.SetTop(terrain.GetBottom());
-        mPlayer.SetVelocityY(0);
-        mPlayer.SetOnGround(false);
-        break;
-
-      case Collision::LEFTWALL:
-        mPlayer.SetLeft(terrain.GetRight());
-        mPlayer.SetVelocityX(0);
-        mPlayer.SetOnLeftWall(true);
-        break;
-
-      case Collision::RIGHTWALL:
-        mPlayer.SetRight(terrain.GetLeft());
-        mPlayer.SetVelocityX(0);
-        mPlayer.SetOnRightWall(true);
-        break;
-    }
-
-    Float2 baseTopLeft = Float2(mPlayer.GetLeft(), mPlayer.GetBaseTop());
-    Float2 baseTopRight = Float2(mPlayer.GetRight(), mPlayer.GetBaseTop());
-    if (terrain.Contains(baseTopLeft) || terrain.Contains(baseTopRight)) {
-      mPlayer.SetForceDuck(true);
+    for (auto& enemy : mEnemies) {
+      CheckCollision(terrain, enemy.get());
     }
   }
 }
@@ -54,9 +69,20 @@ void Game::UpdateMovement(const Inputs& inputs, float deltaTime) {
   }
 }
 
+void Game::UpdateEnemies(float deltaTime) {
+  for (auto& enemy : mEnemies) {
+    Inputs inputs;
+    std::unique_ptr<Attack> currentEnemyAttack = enemy->Update(inputs, deltaTime);
+    if (currentEnemyAttack) {
+      mAttacks.push_back(std::move(currentEnemyAttack));
+    }
+  }
+}
+
 void Game::Update(const Inputs& inputs, float deltaTime) {
 
   UpdateMovement(inputs, deltaTime);
+  UpdateEnemies(deltaTime);
   UpdateCollisions();
 
   // Update Attacks
@@ -90,8 +116,21 @@ void Game::RenderPlayer(SDL_Renderer *renderer) const {
   SDL_RenderTexture(renderer, mPlayer.GetTexture(), NULL, &dst_rect);
 }
 
+void Game::RenderEnemies(SDL_Renderer *renderer) const {
+  for (const auto& enemy : mEnemies) {
+    SDL_FRect dst_rect{enemy->GetLeft() - mCamera.x,
+                     enemy->GetTop() - mCamera.y, 
+                     enemy->GetWidth(), 
+                     enemy->GetHeight()};
+
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    SDL_RenderTexture(renderer, enemy->GetTexture(), NULL, &dst_rect);
+  }
+}
+
 void Game::Render(SDL_Renderer *renderer) {
   RenderCurrentLevel(renderer);
+  RenderEnemies(renderer);
   RenderPlayer(renderer);
 
   for (auto it = mAttacks.begin(); it != mAttacks.end(); ) {

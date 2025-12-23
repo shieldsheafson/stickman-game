@@ -1,51 +1,14 @@
 #include "player.h"
 
-float Player::GetBaseTop() const  {
-  if (mTextureHeight != mCurrentHeight) {
-    return mPosition.y - mTextureHeight / 2;
-  }
-  return GetTop();
-}
-
-void Player::ApplyFriction(float deltaTime) {
-  float friction = (mOnGround ? mGroundFriction : mAirFriction) * deltaTime;
-  if (std::abs(mVelocity.x) <= friction) {
-      mVelocity.x = 0.0f;
-  } else {
-      mVelocity.x -= (mVelocity.x > 0 ? friction : -friction);
-  }
-}
-
-std::unique_ptr<Attack> Player::Update(const Inputs& inputs, float deltaTime) {
-  mInputManager.Update(inputs);
-  mCurrentState->ChangeState();
-  mCurrentState->UpdateHorizontalVelocity(deltaTime);
-  mCurrentState->UpdateVerticalVelocity(deltaTime);
-  mCurrentState->UpdatePosition(deltaTime);
-
-  std::unique_ptr<Attack> attack = nullptr;
-
-  if (mInputManager.GetInputs().mAttackKeyPressed && mTimeTillCanAttack == 0.0f) {
-    attack = mCurrentState->GetAttack();
-  }
-
-  if (attack) {
-    mTimeTillCanAttack = attack->GetLengthOfAttack();
-  } else {
-    mTimeTillCanAttack = std::max(0.0f, mTimeTillCanAttack - deltaTime);
-  }
-
-  return attack;
-}
-
 Float2 Player::GetPositionForCamera() const {
-  Float2 positionForCamera = mPosition;
-  if (mTextureHeight != mCurrentHeight) {
-    positionForCamera.y -= mCurrentHeight;
+  Float2 positionForCamera = GetPosition();
+  if (GetBaseTop() != GetTop()) {
+    positionForCamera.x -= GetHeight();
+    positionForCamera.y -= GetHeight() * 2;
+  } else {
+    positionForCamera.x -= GetHeight()/2;
+    positionForCamera.y -= GetHeight()/2;
   }
-
-  positionForCamera.x -= mTextureWidth/2;
-  positionForCamera.y -= mTextureHeight/2;
 
   return positionForCamera;
 }

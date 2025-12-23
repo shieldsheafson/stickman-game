@@ -6,6 +6,8 @@
 #include "box.h"
 #include "attack.h"
 #include "inputs.h"
+#include "enemy.h"
+#include "entity.h"
 
 #include <list>
 #include <memory>
@@ -17,6 +19,7 @@ class Game {
   private:
     int a = 0;
     Player mPlayer;
+    std::vector<std::unique_ptr<Enemy> > mEnemies;
     Float2 mCamera;
 
     float mWindowWidth;
@@ -27,16 +30,20 @@ class Game {
     std::list<std::unique_ptr<Attack> > mAttacks;
 
     void UpdateMovement(const Inputs& inputs, float deltaTime);
+    void UpdateEnemies(float deltaTime);
     void UpdateCollisions();
+    void CheckCollision(const Box& terrain, Entity* entity);
 
     void RenderCurrentLevel(SDL_Renderer *renderer) const;
     void RenderPlayer(SDL_Renderer *renderer) const;
+    void RenderEnemies(SDL_Renderer *renderer) const;
 
   public:
     Game() = delete;
     Game(SDL_Texture* texture, const std::vector<Level>& levels, float windowWidth, float windowHeight)
       : mPlayer(texture, Float2(0,0), 50, 99), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
         mCamera = mPlayer.GetPosition();
+        mEnemies.push_back(std::make_unique<Enemy>(texture, Float2(10,10), 50, 99));
       }
 
     const Player& GetPlayer() const { return mPlayer; }

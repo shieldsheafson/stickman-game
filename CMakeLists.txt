@@ -33,6 +33,7 @@ target_sources(stickman PRIVATE
     src/collision.cpp
     src/debugframe.cpp
     src/driver.cpp
+    src/entity.cpp
     src/float2.cpp
     src/game.cpp
     src/inputs.cpp
@@ -41,18 +42,19 @@ target_sources(stickman PRIVATE
     src/recorder.cpp
     src/utils.cpp
 
-    src/playerstates/ducking.cpp
-    src/playerstates/falling.cpp
-    src/playerstates/groundsliding.cpp
-    src/playerstates/jumping.cpp
-    src/playerstates/standing.cpp
-    src/playerstates/wallsliding.cpp
+    src/entitystates/ducking.cpp
+    src/entitystates/falling.cpp
+    src/entitystates/groundsliding.cpp
+    src/entitystates/jumping.cpp
+    src/entitystates/standing.cpp
+    src/entitystates/wallsliding.cpp
 
     src/attack.h
     src/box.h
     src/collision.h
     src/debugframe.h
     src/direction.h
+    src/entity.h
     src/float2.h
     src/game.h
     src/gamemode.h

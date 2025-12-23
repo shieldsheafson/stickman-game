@@ -11,7 +11,7 @@ private:
 public:
   InputManager(): mInputs(), mPreviousInputs(), mDirection(Direction::RIGHT) {}
 
-  void Update(Inputs inputs) {
+  void Update(const Inputs& inputs) {
     mPreviousInputs = mInputs;
     mInputs = inputs;
     if (mInputs.mLeftKeyPressed == mInputs.mRightKeyPressed) {

@@ -11,7 +11,8 @@ struct Inputs {
   bool mAttackKeyPressed;
 
   Inputs(): mJumpKeyPressed(false), mLeftKeyPressed(false),
-            mRightKeyPressed(false), mDownKeyPressed(false) {}
+            mRightKeyPressed(false), mDownKeyPressed(false), 
+            mAttackKeyPressed(false) {}
   Inputs(const bool *keystate)
     : mJumpKeyPressed(keystate[SDL_SCANCODE_Z]), mLeftKeyPressed(keystate[SDL_SCANCODE_LEFT]),
       mRightKeyPressed(keystate[SDL_SCANCODE_RIGHT]), mDownKeyPressed(keystate[SDL_SCANCODE_DOWN]),
