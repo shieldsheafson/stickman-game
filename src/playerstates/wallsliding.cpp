@@ -12,13 +12,13 @@ void Player::WallSliding::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::WallSliding::ChangeState() {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Standing>();
     return;
   }
   
-  if (inputs.mJumpKeyPressed && !mPlayer.mInputs.GetPreviousInputs().mJumpKeyPressed) {
+  if (inputs.mJumpKeyPressed && !mPlayer.mInputManager.GetPreviousInputs().mJumpKeyPressed) {
     mPlayer.ChangeStateTo<Jumping>();
     return;
   }

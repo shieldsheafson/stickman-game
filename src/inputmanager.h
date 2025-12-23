@@ -1,23 +1,7 @@
 #pragma once
-#include <SDL3/SDL.h>
-#include <memory>
 
 #include "direction.h"
-
-struct Inputs {
-  bool mJumpKeyPressed;
-  bool mLeftKeyPressed;
-  bool mRightKeyPressed;
-  bool mDownKeyPressed;
-  bool mAttackKeyPressed;
-
-  Inputs(): mJumpKeyPressed(false), mLeftKeyPressed(false),
-            mRightKeyPressed(false), mDownKeyPressed(false) {}
-  Inputs(const bool *keystate)
-    : mJumpKeyPressed(keystate[SDL_SCANCODE_Z]), mLeftKeyPressed(keystate[SDL_SCANCODE_LEFT]),
-      mRightKeyPressed(keystate[SDL_SCANCODE_RIGHT]), mDownKeyPressed(keystate[SDL_SCANCODE_DOWN]),
-      mAttackKeyPressed(keystate[SDL_SCANCODE_X]) {}
-};
+#include "inputs.h"
 
 class InputManager {
 private:
@@ -27,9 +11,9 @@ private:
 public:
   InputManager(): mInputs(), mPreviousInputs(), mDirection(Direction::RIGHT) {}
 
-  void Update(const bool *keystate) {
+  void Update(Inputs inputs) {
     mPreviousInputs = mInputs;
-    mInputs = Inputs(keystate);
+    mInputs = inputs;
     if (mInputs.mLeftKeyPressed == mInputs.mRightKeyPressed) {
     } else if (mInputs.mLeftKeyPressed) {
       mDirection = Direction::LEFT;

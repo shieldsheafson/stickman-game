@@ -127,7 +127,7 @@ private:
   float mCoyoteTime = .2;
   
   // Input state (from keyboard input)
-  InputManager mInputs;
+  InputManager mInputManager;
 
   // Collision state (set by collision detection)
   bool mOnGround = false;
@@ -141,7 +141,7 @@ private:
 
   std::unique_ptr<Weapon> mWeapon = nullptr;
 
-  bool OpposingVelocity() { return (mInputs.GetInputs().mLeftKeyPressed && mVelocity.x > 0) || (mInputs.GetInputs().mRightKeyPressed && mVelocity.x < 0); }
+  bool OpposingVelocity() { return (mInputManager.GetInputs().mLeftKeyPressed && mVelocity.x > 0) || (mInputManager.GetInputs().mRightKeyPressed && mVelocity.x < 0); }
   void ApplyFriction(float deltaTime);
 
 public:
@@ -174,7 +174,7 @@ public:
   float GetBaseTop() const;
   float GetLeft() const { return mPosition.x; }
   float GetRight() const { return mPosition.x + mCurrentWidth; }
-  float GetFront() const { return mInputs.GetDirection() == Direction::LEFT ? GetLeft() : GetRight(); }
+  float GetFront() const { return mInputManager.GetDirection() == Direction::LEFT ? GetLeft() : GetRight(); }
   float GetWidth() const { return mCurrentWidth; }
   float GetHeight() const { return mCurrentHeight; }
 
@@ -216,7 +216,7 @@ public:
     mCurrentState->OnEnter();
   }
 
-  std::unique_ptr<Attack> Update(float deltaTime, const bool* keystate);
+  std::unique_ptr<Attack> Update(const Inputs& inputs, float deltaTime);
   Player(const Player&) = delete;
   Player& operator=(const Player&) = delete;
   Player(Player&&) noexcept = default;

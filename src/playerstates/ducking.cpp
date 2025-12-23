@@ -11,7 +11,7 @@ void Player::Ducking::OnExit() {
 }
 
 void Player::Ducking::UpdateHorizontalVelocity(float deltaTime) {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
@@ -36,7 +36,7 @@ void Player::Ducking::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::Ducking::ChangeState() {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (!mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Falling>();
     return;
@@ -60,11 +60,11 @@ std::unique_ptr<Attack> Player::Ducking::GetAttack() {
   std::unique_ptr<Attack> attack = mPlayer.mWeapon->GetAttack();
 
   // idk what the best way to format this tbh, not sure the ternary operator is the move
-  Float2 front = mPlayer.mInputs.GetDirection() == Direction::RIGHT
+  Float2 front = mPlayer.mInputManager.GetDirection() == Direction::RIGHT
     ? Float2(mPlayer.GetFront() + mPlayer.mWeapon->GetOffset(), mPlayer.GetTop())
     : Float2(mPlayer.GetFront() - mPlayer.mWeapon->GetOffset(), mPlayer.GetTop());
 
-  attack->Transform(front, mPlayer.mInputs.GetDirection());
+  attack->Transform(front, mPlayer.mInputManager.GetDirection());
 
   return attack;
 }

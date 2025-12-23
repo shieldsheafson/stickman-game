@@ -16,8 +16,8 @@ void Player::ApplyFriction(float deltaTime) {
   }
 }
 
-std::unique_ptr<Attack> Player::Update(float deltaTime, const bool* keystate) {
-  mInputs.Update(keystate);
+std::unique_ptr<Attack> Player::Update(const Inputs& inputs, float deltaTime) {
+  mInputManager.Update(inputs);
   mCurrentState->ChangeState();
   mCurrentState->UpdateHorizontalVelocity(deltaTime);
   mCurrentState->UpdateVerticalVelocity(deltaTime);
@@ -25,7 +25,7 @@ std::unique_ptr<Attack> Player::Update(float deltaTime, const bool* keystate) {
 
   std::unique_ptr<Attack> attack = nullptr;
 
-  if (mInputs.GetInputs().mAttackKeyPressed && mTimeTillCanAttack == 0.0f) {
+  if (mInputManager.GetInputs().mAttackKeyPressed && mTimeTillCanAttack == 0.0f) {
     attack = mCurrentState->GetAttack();
   }
 

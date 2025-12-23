@@ -5,6 +5,7 @@
 #include "player.h"
 #include "box.h"
 #include "attack.h"
+#include "inputs.h"
 
 #include <list>
 #include <memory>
@@ -25,7 +26,7 @@ class Game {
     std::vector<Level> mLevels;
     std::list<std::unique_ptr<Attack> > mAttacks;
 
-    void UpdateMovement(const bool *keystate, float deltaTime);
+    void UpdateMovement(const Inputs& inputs, float deltaTime);
     void UpdateCollisions();
 
     void RenderCurrentLevel(SDL_Renderer *renderer) const;
@@ -41,7 +42,7 @@ class Game {
     const Player& GetPlayer() const { return mPlayer; }
     const Level& GetLevel() const { return mLevels[mCurrentLevelIndex]; }
 
-    void Update(const bool *keystate, float deltaTime);
+    void Update(const Inputs& inputs, float deltaTime);
     void Render(SDL_Renderer *renderer);
 
     Game(const Game&) = delete;

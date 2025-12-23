@@ -47,15 +47,16 @@ void Game::UpdateCollisions() {
   }
 }
 
-void Game::UpdateMovement(const bool *keystate, float deltaTime) {
-  std::unique_ptr<Attack> currentPlayerAttack = mPlayer.Update(deltaTime, keystate);
+void Game::UpdateMovement(const Inputs& inputs, float deltaTime) {
+  std::unique_ptr<Attack> currentPlayerAttack = mPlayer.Update(inputs, deltaTime);
   if (currentPlayerAttack) {
     mAttacks.push_back(std::move(currentPlayerAttack));
   }
 }
 
-void Game::Update(const bool *keystate, float deltaTime) {
-  UpdateMovement(keystate, deltaTime);
+void Game::Update(const Inputs& inputs, float deltaTime) {
+
+  UpdateMovement(inputs, deltaTime);
   UpdateCollisions();
 
   // Update Attacks

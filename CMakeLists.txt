@@ -30,12 +30,15 @@ add_executable(stickman)
 # Add all source files
 target_sources(stickman PRIVATE
     src/box.cpp
-    src/collision.cpp 
+    src/collision.cpp
+    src/debugframe.cpp
     src/driver.cpp
     src/float2.cpp
     src/game.cpp
+    src/inputs.cpp
     src/level.cpp
     src/player.cpp
+    src/recorder.cpp
     src/utils.cpp
 
     src/playerstates/ducking.cpp
@@ -48,11 +51,16 @@ target_sources(stickman PRIVATE
     src/attack.h
     src/box.h
     src/collision.h
+    src/debugframe.h
     src/direction.h
     src/float2.h
+    src/game.h
+    src/gamemode.h
     src/inputmanager.h
+    src/inputs.h
     src/level.h
     src/player.h
+    src/recorder.h
     src/utils.h
     src/weapon.h
 

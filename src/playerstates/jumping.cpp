@@ -1,7 +1,7 @@
 #include "player.h"
 
 void Player::Jumping::UpdateHorizontalVelocity(float deltaTime) {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
@@ -29,7 +29,7 @@ void Player::Jumping::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::Jumping::ChangeState() {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (mPlayer.mOnLeftWall || mPlayer.mOnRightWall) {
     mPlayer.ChangeStateTo<WallSliding>();
     return;
@@ -45,11 +45,11 @@ std::unique_ptr<Attack> Player::Jumping::GetAttack() {
   std::unique_ptr<Attack> attack = mPlayer.mWeapon->GetAttack();
 
   // idk what the best way to format this tbh, not sure the ternary operator is the move
-  Float2 front = mPlayer.mInputs.GetDirection() == Direction::RIGHT
+  Float2 front = mPlayer.mInputManager.GetDirection() == Direction::RIGHT
     ? Float2(mPlayer.GetFront() + mPlayer.mWeapon->GetOffset(), mPlayer.GetTop())
     : Float2(mPlayer.GetFront() - mPlayer.mWeapon->GetOffset(), mPlayer.GetTop());
 
-  attack->Transform(front, mPlayer.mInputs.GetDirection());
+  attack->Transform(front, mPlayer.mInputManager.GetDirection());
 
   return attack;
 }

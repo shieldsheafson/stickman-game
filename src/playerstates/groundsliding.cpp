@@ -11,7 +11,7 @@ void Player::GroundSliding::OnExit() {
 }
 
 void Player::GroundSliding::UpdateHorizontalVelocity(float deltaTime) {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (inputs.mLeftKeyPressed && inputs.mRightKeyPressed) {
     return;
   }
@@ -34,7 +34,7 @@ void Player::GroundSliding::UpdateVerticalVelocity(float deltaTime) {
 }
 
 void Player::GroundSliding::ChangeState() {
-  const Inputs& inputs = mPlayer.mInputs.GetInputs();
+  const Inputs& inputs = mPlayer.mInputManager.GetInputs();
   if (!mPlayer.mOnGround) {
     mPlayer.ChangeStateTo<Falling>();
     return;
