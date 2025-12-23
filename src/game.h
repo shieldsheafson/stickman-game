@@ -25,7 +25,7 @@ class Game {
     float mWindowWidth;
     float mWindowHeight;
 
-    int mCurrentLevelIndex = 0;
+    int mCurrentLevelIndex = 1;
     std::vector<Level> mLevels;
     std::list<std::unique_ptr<Attack> > mAttacks;
 
@@ -42,8 +42,11 @@ class Game {
     Game() = delete;
     Game(SDL_Texture* texture, const std::vector<Level>& levels, float windowWidth, float windowHeight)
       : mPlayer(texture, Float2(0,0), 50, 99), mLevels(levels), mWindowHeight(windowHeight), mWindowWidth(windowWidth) {
+        Float2 spawn = mLevels.at(mCurrentLevelIndex).mSpawn;
+        mPlayer.SetPosition(Float2(spawn.x, spawn.y - mPlayer.GetHeight()));
         mCamera = mPlayer.GetPosition();
-        mEnemies.push_back(std::make_unique<Enemy>(texture, Float2(10,10), 50, 99));
+        mEnemies.push_back(std::make_unique<Enemy>(texture, Float2(1000,1700), 50, 99));
+        UpdateCollisions();
       }
 
     const Player& GetPlayer() const { return mPlayer; }

@@ -11,6 +11,7 @@
 #define SDL_MAIN_USE_CALLBACKS 1
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -103,12 +104,19 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
   }
 
   SDL_DestroySurface(surface);  /* done with this, the texture has a copy of the pixels now. */
-
-  Level level;
-  std::ifstream ifs("../Levels/level1.txt");
-  ifs >> level;
   std::vector<Level> levels;
-  levels.push_back(level);
+  unsigned int numLevels = 2;
+  for (unsigned int i = 1; i < numLevels + 1; ++i) {
+    std::stringstream ss;
+    ss << "../Levels/level" << i << ".txt";
+    std::ifstream ifs(ss.str());
+    if (!ifs.is_open()) {
+      std::cout << "Level file " << i << " failed to open.";
+      return SDL_APP_FAILURE;
+    }
+    Level level(ifs);
+    levels.push_back(level); 
+  }
   game.emplace(texture, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
   lastFrameTime = SDL_GetTicks();
   SDL_SetRenderVSync(renderer, 1); // prevent screen tearing

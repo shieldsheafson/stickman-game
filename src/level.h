@@ -11,9 +11,11 @@
 struct Level {
   float mHeight;
   float mWidth;
+  Float2 mSpawn;
   std::vector<Box> mTerrain;
 
   Level() {}
+  Level(std::istream& is);
 };
 
 std::ostream& operator<<(std::ostream& os, const Level& l);

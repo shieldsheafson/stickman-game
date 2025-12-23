@@ -1,8 +1,14 @@
 #include "level.h"
 
+Level::Level(std::istream& is): mWidth(0), mHeight(0) {
+  is >> *this;
+}
+
 std::ostream& operator<<(std::ostream& os, const Level& l) {
-  for (const Box& t : l.mTerrain) {
-    os << t << "\n";
+  os << l.mWidth << " " << l.mHeight << "\n";
+  os << l.mSpawn.x << " " << l.mSpawn.y << "\n";
+  for (const Box& b : l.mTerrain) {
+    os << b << "\n";
   }
 
   return os;
@@ -10,6 +16,7 @@ std::ostream& operator<<(std::ostream& os, const Level& l) {
 
 std::istream& operator>>(std::istream& is, Level& l) {
   is >> l.mWidth >> l.mHeight;
+  is >> l.mSpawn;
   l.mTerrain.clear();
   float x, y, w, h;
   while (is >> x >> y >> w >> h) {

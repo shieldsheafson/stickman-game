@@ -188,7 +188,7 @@ public:
 
   // Set Methods ----------------------------------------------------------------------------------
   // position
-  void SetPosition(Float2 position) { mPosition = position; }
+  void SetPosition(const Float2& position) { mPosition = position; }
   void SetBottom(float bottom) { mPosition.y = bottom - mCurrentHeight; }
   void SetTop(float top) { mPosition.y = top; }
   void SetLeft(float left) { mPosition.x = left; }

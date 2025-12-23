@@ -92,7 +92,8 @@ void Game::Update(const Inputs& inputs, float deltaTime) {
 
   // hack to keep player on the screen
   if (mPlayer.GetPosition().y > mLevels[mCurrentLevelIndex].mHeight) {
-    mPlayer.SetPosition(Float2(0,0));
+    Float2 spawn = mLevels.at(mCurrentLevelIndex).mSpawn;
+    mPlayer.SetPosition(Float2(spawn.x, spawn.y - mPlayer.GetHeight()));
   }
 
   mCamera = mPlayer.GetPositionForCamera() - Float2(mWindowWidth/2, mWindowHeight/2);
