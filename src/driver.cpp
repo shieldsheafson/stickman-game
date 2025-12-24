@@ -117,7 +117,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     Level level(ifs);
     levels.push_back(level); 
   }
-  game.emplace(texture, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
+  game.emplace(texture, texture, levels, WINDOW_WIDTH, WINDOW_HEIGHT);
   lastFrameTime = SDL_GetTicks();
   SDL_SetRenderVSync(renderer, 1); // prevent screen tearing
   return SDL_APP_CONTINUE;

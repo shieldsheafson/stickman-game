@@ -13,6 +13,7 @@ class Box {
     SDL_FRect rect;
 
   public:
+    Box(): rect{0, 0, 0, 0} {}
     Box(Float2 a, Float2 b): 
     rect{std::min(a.x, b.x), 
          std::min(a.y, b.y), 

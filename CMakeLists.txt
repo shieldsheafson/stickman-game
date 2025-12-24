@@ -9,6 +9,14 @@ if(APPLE)
     )
 endif()
 
+option(ENABLE_SANITIZERS "Enable sanitizers" OFF)
+
+if(ENABLE_SANITIZERS)
+    set(SANITIZER_FLAGS "-fsanitize=address,undefined -fno-omit-frame-pointer -g")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SANITIZER_FLAGS}")
+    set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${SANITIZER_FLAGS}")
+endif()
+
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -34,6 +42,8 @@ target_sources(stickman PRIVATE
     src/collision.cpp
     src/debugframe.cpp
     src/driver.cpp
+    src/enemy.cpp
+    src/enemyai.cpp
     src/entity.cpp
     src/float2.cpp
     src/game.cpp
@@ -55,6 +65,8 @@ target_sources(stickman PRIVATE
     src/collision.h
     src/debugframe.h
     src/direction.h
+    src/enemy.h
+    src/enemyai.h
     src/entity.h
     src/float2.h
     src/game.h

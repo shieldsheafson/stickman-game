@@ -183,6 +183,8 @@ public:
   Float2 GetBottomLeft() const { return Float2(GetLeft(), GetBottom()); }
   Float2 GetBottomRight() const { return Float2(GetRight(), GetBottom()); }
 
+  const Inputs& GetPreviousInputs() const { return mInputManager.GetPreviousInputs(); }
+
   const std::unique_ptr<State>& GetState() const { return mCurrentState; }
 
   // movement
@@ -199,6 +201,7 @@ public:
   void SetTop(float top) { mPosition.y = top; }
   void SetLeft(float left) { mPosition.x = left; }
   void SetRight(float right) { mPosition.x = right - mCurrentWidth; }
+  void SetHealth(int health) { mHealth = health; }
 
   // movement
   void SetOnGround(bool onGround) { mOnGround = onGround; }

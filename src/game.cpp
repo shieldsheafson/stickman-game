@@ -1,5 +1,31 @@
 #include "game.h"
 
+void Game::UpdateState() {
+  mState.mPlayerHitBox = Box(mPlayer.GetTopLeft(), mPlayer.GetBottomRight());
+  mState.mPlayerAttackHitboxes.clear();
+  for (auto& attack : mPlayerAttacks) {
+    const Box* const attackHitbox = attack->GetCurrentFrame();
+    if (attackHitbox == nullptr) { continue; }
+    mState.mPlayerAttackHitboxes.push_back(*attackHitbox);
+  }
+
+  mState.mEnemyHitBoxes.clear();
+  for (auto& enemy : mEnemies) {
+    mState.mEnemyHitBoxes.push_back(Box(enemy->GetTopLeft(), enemy->GetBottomRight()));
+  }
+  mState.mEnemyAttackHitboxes.clear();
+  for (auto& attack : mEnemyAttacks) {
+    const Box* const attackHitbox = attack->GetCurrentFrame();
+    if (attackHitbox == nullptr) { continue; }
+    mState.mEnemyAttackHitboxes.push_back(*attackHitbox);
+  }
+
+  mState.mTerrain.clear();
+  for (const Box& t : mLevels.at(mCurrentLevelIndex).mTerrain) {
+    mState.mTerrain.push_back(t);
+  }
+}
+
 void Game::UpdateAttacks(float deltaTime) {
   for (auto& enemy : mEnemies) {
     for (auto& attack : mPlayerAttacks) {
@@ -16,6 +42,16 @@ void Game::UpdateAttacks(float deltaTime) {
 
   for (auto& attack : mEnemyAttacks) {
     attack->Update(deltaTime);
+    if (mPlayer.AttackHits(attack.get())) {
+      mPlayer.DealDamage(attack->mDamage);
+      attack->End();
+    }
+  }
+
+  if (mPlayer.GetHealth() <= 0) {
+    Float2 spawn = mLevels.at(mCurrentLevelIndex).mSpawn;
+    mPlayer.SetPosition(Float2(spawn.x, spawn.y - mPlayer.GetHeight()));
+    mPlayer.SetHealth(5);
   }
 }
 
@@ -93,9 +129,10 @@ void Game::UpdateEnemies(float deltaTime) {
     auto& enemy = *it;
     if (enemy->GetHealth() <= 0) {
       it = mEnemies.erase(it);
+      mEnemies.push_back(std::make_unique<BasicEnemy>(mEnemyTexture, Float2(1000,1700), 2, 50, 99));
       continue;
     }
-    Inputs inputs;
+    Inputs inputs = mEnemyAI.GetInputs(*enemy, mState);
     std::unique_ptr<Attack> currentEnemyAttack = enemy->Update(inputs, deltaTime);
     if (currentEnemyAttack) {
       mEnemyAttacks.push_back(std::move(currentEnemyAttack));
@@ -110,6 +147,7 @@ void Game::Update(const Inputs& inputs, float deltaTime) {
   UpdateEnemies(deltaTime);
   UpdateCollisions();
   UpdateAttacks(deltaTime);
+  UpdateState();
 
   // hack to keep player on the screen
   if (mPlayer.GetPosition().y > mLevels[mCurrentLevelIndex].mHeight) {
@@ -165,6 +203,19 @@ void Game::Render(SDL_Renderer *renderer) {
       ++it;
     } else {
       it = mPlayerAttacks.erase(it);
+    }
+  }
+
+  for (auto it = mEnemyAttacks.begin(); it != mEnemyAttacks.end(); ) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    const Box* currentFrame = (*it)->GetCurrentFrame();
+    
+    if (currentFrame) {
+      SDL_FRect dst_rect = currentFrame->GetModifiedSDLRect(mCamera);
+      SDL_RenderFillRect(renderer, &dst_rect);
+      ++it;
+    } else {
+      it = mEnemyAttacks.erase(it);
     }
   }
   
